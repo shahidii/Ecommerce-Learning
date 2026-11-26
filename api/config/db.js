@@ -34,17 +34,33 @@ const logQueries = () => {
     });
 };
 
-// 1. Try MongoDB Atlas (cloud)  2. Fall back to local MongoDB
+// Atlas rejects connections from IP addresses that are not on its Network Access list
+const isIpNotAllowed = (error) => /whitelist|ip address|not authorized to access|Could not connect to any servers/i.test(error.message);
+
+const ipHint = () =>
+    process.env.RENDER
+        ? "Atlas blocked this server's IP. Fix: Render → your service → Connect → Outbound → copy the IP ranges → Atlas → Network Access → Add IP Address (one entry per range)."
+        : "Atlas blocked your IP. Fix: Atlas → Network Access → Add IP Address → Add Current IP Address.";
+
+// 1. Try MongoDB Atlas (cloud)
+// 2. In DEVELOPMENT only: fall back to local MongoDB
+//    (in production there is no local MongoDB, so falling back would only hide the real error)
 const connectDB = async () => {
     logQueries();
+    const canFallBack = env.NODE_ENV !== "production" && Boolean(env.MONGO_URI_LOCAL);
+
     if (env.MONGODB_URI) {
         try {
             return await tryConnect(env.MONGODB_URI, "Atlas");
         } catch (error) {
             logger.error(`MongoDB Atlas connection failed: ${error.message}`);
-            if (!env.MONGO_URI_LOCAL) process.exit(1);
+            if (isIpNotAllowed(error)) logger.error(ipHint());
+            if (!canFallBack) process.exit(1);
             logger.warn(`Falling back to local MongoDB: ${mask(env.MONGO_URI_LOCAL)}`);
         }
+    } else if (env.NODE_ENV === "production") {
+        logger.fatal("MONGODB_URI is not set. Add it in your hosting provider's environment variables.");
+        process.exit(1);
     }
 
     try {

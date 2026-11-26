@@ -384,14 +384,22 @@ logger.error({ err }, "Payment provider down");     // pass errors as { err } to
 | Key | Value |
 | --- | --- |
 | `NODE_ENV` | `production` |
-| `MONGODB_URI` | your Atlas `mongodb+srv://...` URI |
+| `MONGODB_URI` | your Atlas `mongodb+srv://...` URI (don't set `MONGO_URI_LOCAL` on Render: the local fallback only runs in development) |
 | `MONGODB_DB_NAME` | `shopnest` |
 | `JWT_SECRET` | a long random string, e.g. output of `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
 | `JWT_EXPIRES_IN` | `7d` |
 | `ALLOWED_ORIGINS` | `*` (any student frontend) or a list like `http://localhost:5173,https://my-shop.vercel.app` |
 
-5. **MongoDB Atlas → Network Access → Add IP Address → Allow access from anywhere (`0.0.0.0/0`)**.
-   Render's free plan has no fixed IP, so without this the server cannot reach the database.
+5. **Allow Render's IPs in Atlas** (instead of opening the database to everyone with `0.0.0.0/0`):
+   1. Render → your service → **Connect** (top right) → **Outbound** tab → copy the IP ranges (e.g. `74.220.48.0/24`).
+   2. Atlas → **Security → Network Access → Add IP Address** → paste **one range per entry** → Confirm.
+   3. Wait until every entry shows **Active**, then Render → **Manual Deploy → Restart service**.
+
+   These ranges are shared by all Render services in your region, so also keep the database user safe:
+   a strong password and only the `readWrite` role on the `shopnest` database.
+   (For IPs used only by you, Render sells [dedicated outbound IPs](https://render.com/docs/dedicated-ips).)
+
+   If you forget this step, the logs say: *"Atlas blocked this server's IP. Fix: Render → your service → Connect → Outbound …"*.
 6. Deploy. Then open `https://<your-service>.onrender.com/api/docs`.
 
 The data is already in Atlas if you ran `pnpm seed` locally with the same `MONGODB_URI`.
