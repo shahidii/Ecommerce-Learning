@@ -22,12 +22,17 @@
  *     category:
  *       in: query
  *       name: category
- *       schema: { type: string, example: smartphones }
+ *       schema: { type: string, example: feeding-essentials }
  *       description: Category slug (from GET /categories)
+ *     ageGroup:
+ *       in: query
+ *       name: ageGroup
+ *       schema: { type: string, enum: [newborn, infant, toddler, preschool], example: newborn }
+ *       description: Age group slug (from GET /age-groups). Powers "Shop by Age"
  *     brand:
  *       in: query
  *       name: brand
- *       schema: { type: string, example: "Nexa,Orbit" }
+ *       schema: { type: string, example: "Little Nest,PureBub" }
  *       description: One brand or a comma separated list (case-insensitive)
  *     minPrice:
  *       in: query
@@ -126,19 +131,22 @@
  *
  *       Examples:
  *       - `/products?page=2&limit=12`
- *       - `/products?category=laptops&sort=price_asc`
+ *       - `/products?category=feeding-essentials&sort=price_asc`
+ *       - `/products?ageGroup=newborn` (Shop by Age)
+ *       - `/products?category=toys-development&ageGroup=toddler`
  *       - `/products?minPrice=1000&maxPrice=5000&minRating=4`
  *       - `/products?featured=true&limit=8` (home page)
- *       - `/products?search=shirt` (same as /products/search)
+ *       - `/products?search=bottle` (same as /products/search)
  *     tags: [Products]
  *     parameters:
  *       - $ref: '#/components/parameters/page'
  *       - $ref: '#/components/parameters/limit'
  *       - in: query
  *         name: search
- *         schema: { type: string, example: phone }
- *         description: Matches title, brand, tags or category name
+ *         schema: { type: string, example: bottle }
+ *         description: Matches title, brand, tags, category name or age group name
  *       - $ref: '#/components/parameters/category'
+ *       - $ref: '#/components/parameters/ageGroup'
  *       - $ref: '#/components/parameters/brand'
  *       - $ref: '#/components/parameters/minPrice'
  *       - $ref: '#/components/parameters/maxPrice'
@@ -188,7 +196,7 @@
  *   get:
  *     summary: Search products
  *     description: |
- *       Powers the **search bar**. Case-insensitive, partial matching on title, brand, tags and category name.
+ *       Powers the **search bar**. Case-insensitive, partial matching on title, brand, tags, category name and age group name.
  *       Supports every filter and sort option from `GET /products`.
  *
  *       Tip: for live suggestions while typing, debounce the input (~300 ms) and call `?q=<text>&limit=5`.
@@ -197,11 +205,12 @@
  *       - in: query
  *         name: q
  *         required: true
- *         schema: { type: string, example: shirt }
+ *         schema: { type: string, example: teddy }
  *         description: Search text (1–100 characters)
  *       - $ref: '#/components/parameters/page'
  *       - $ref: '#/components/parameters/limit'
  *       - $ref: '#/components/parameters/category'
+ *       - $ref: '#/components/parameters/ageGroup'
  *       - $ref: '#/components/parameters/minPrice'
  *       - $ref: '#/components/parameters/maxPrice'
  *       - $ref: '#/components/parameters/sort'
@@ -214,11 +223,11 @@
  *               type: object
  *               properties:
  *                 success: { type: boolean, example: true }
- *                 message: { type: string, example: "Found 3 product(s) for \"shirt\"" }
+ *                 message: { type: string, example: "Found 2 product(s) for \"teddy\"" }
  *                 data:
  *                   type: object
  *                   properties:
- *                     query: { type: string, example: shirt }
+ *                     query: { type: string, example: teddy }
  *                     products: { type: array, items: { $ref: '#/components/schemas/Product' } }
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  *       400:
@@ -231,13 +240,13 @@
  * /products/slug/{slug}:
  *   get:
  *     summary: Get a product by slug
- *     description: For SEO-friendly URLs like `/product/nexa-13-pro-128-gb-graphite`.
+ *     description: For SEO-friendly URLs like `/product/anti-colic-feeding-bottle-260-ml`.
  *     tags: [Products]
  *     parameters:
  *       - in: path
  *         name: slug
  *         required: true
- *         schema: { type: string, example: nexa-13-pro-128-gb-graphite }
+ *         schema: { type: string, example: anti-colic-feeding-bottle-260-ml }
  *     responses:
  *       200: { $ref: '#/components/responses/SingleProduct' }
  *       404: { $ref: '#/components/responses/ProductNotFound' }

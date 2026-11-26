@@ -28,7 +28,7 @@
  *       - in: path
  *         name: slug
  *         required: true
- *         schema: { type: string, example: laptops }
+ *         schema: { type: string, example: feeding-essentials }
  *     responses:
  *       200:
  *         description: Category
@@ -59,9 +59,10 @@
  *       - in: path
  *         name: slug
  *         required: true
- *         schema: { type: string, example: laptops }
+ *         schema: { type: string, example: feeding-essentials }
  *       - $ref: '#/components/parameters/page'
  *       - $ref: '#/components/parameters/limit'
+ *       - $ref: '#/components/parameters/ageGroup'
  *       - $ref: '#/components/parameters/minPrice'
  *       - $ref: '#/components/parameters/maxPrice'
  *       - $ref: '#/components/parameters/sort'
@@ -74,7 +75,7 @@
  *               type: object
  *               properties:
  *                 success: { type: boolean, example: true }
- *                 message: { type: string, example: "Products in Laptops fetched successfully" }
+ *                 message: { type: string, example: "Products in Feeding Essentials fetched successfully" }
  *                 data:
  *                   type: object
  *                   properties:

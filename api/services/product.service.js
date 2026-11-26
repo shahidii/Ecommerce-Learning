@@ -6,6 +6,7 @@ const { getPagination, buildMeta } = require("../utils/pagination");
 const { createLogger } = require("../utils/requestContext");
 const productRepository = require("../repositories/product.repository");
 const categoryRepository = require("../repositories/category.repository");
+const ageGroupRepository = require("../repositories/ageGroup.repository");
 
 const log = createLogger("service");
 
@@ -33,10 +34,19 @@ const buildFilter = async (query) => {
     const filter = {};
 
     if (query.search) {
-        log.debug(`Search "${query.search}": matching title, brand, tags and category names (case-insensitive)`);
+        log.debug(`Search "${query.search}": matching title, brand, tags, category and age group names (case-insensitive)`);
         const regex = new RegExp(escapeRegex(query.search), "i");
-        const categoryIds = await categoryRepository.findIdsByNameLike(regex);
-        filter.$or = [{ title: regex }, { brand: regex }, { tags: regex }, { category: { $in: categoryIds } }];
+        const [categoryIds, ageGroupIds] = await Promise.all([
+            categoryRepository.findIdsByNameLike(regex),
+            ageGroupRepository.findIdsByNameLike(regex),
+        ]);
+        filter.$or = [
+            { title: regex },
+            { brand: regex },
+            { tags: regex },
+            { category: { $in: categoryIds } },
+            { ageGroups: { $in: ageGroupIds } },
+        ];
     }
 
     if (query.category) {
@@ -46,6 +56,15 @@ const buildFilter = async (query) => {
             throw ApiError.notFound("CATEGORY_NOT_FOUND", `Category "${query.category}" not found`, { field: "category" });
         }
         filter.category = category._id;
+    }
+
+    if (query.ageGroup) {
+        const ageGroup = await ageGroupRepository.findBySlug(query.ageGroup);
+        if (!ageGroup) {
+            log.debug(`Age group slug "${query.ageGroup}" not found → 404`);
+            throw ApiError.notFound("AGE_GROUP_NOT_FOUND", `Age group "${query.ageGroup}" not found`, { field: "ageGroup" });
+        }
+        filter.ageGroups = ageGroup._id; // matches products whose ageGroups array contains this id
     }
 
     if (query.brand) {
@@ -134,8 +153,17 @@ const uniqueSlug = async (title, excludeId) => {
     return slug;
 };
 
+const ensureAgeGroupsExist = async (ageGroupIds = []) => {
+    if (!ageGroupIds.length) return;
+    const found = await ageGroupRepository.countByIds(ageGroupIds);
+    if (found !== new Set(ageGroupIds.map(String)).size) {
+        throw ApiError.notFound("AGE_GROUP_NOT_FOUND", "One or more age groups not found", { field: "ageGroupIds" });
+    }
+};
+
 const createProduct = async (data) => {
     await ensureCategoryExists(data.category);
+    await ensureAgeGroupsExist(data.ageGroups);
     const slug = await uniqueSlug(data.title);
     log.debug(`Generated unique slug "${slug}"`);
     const product = await productRepository.create({ ...data, slug, images: data.images?.length ? data.images : [data.thumbnail] });
@@ -151,6 +179,7 @@ const updateProduct = async (id, data) => {
         throw ApiError.badRequest("VALIDATION_ERROR", "price cannot be greater than mrp", { field: "price" });
     }
     if (data.category) await ensureCategoryExists(data.category);
+    if (data.ageGroups) await ensureAgeGroupsExist(data.ageGroups);
     if (data.title) data.slug = await uniqueSlug(data.title, id);
 
     const product = await productRepository.updateById(id, data);

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "ShopNest E-commerce API",
-    "description": "Learning API for the React e-commerce project.\n\n1. Import this collection **and** the environment file.\n2. Select the **ShopNest Local** environment (top right).\n3. Run **Auth → Login (demo user)** first — the token is saved automatically into `{{token}}`.\n4. Products → *Get products* saves the first product id into `{{productId}}` for the detail requests.\n\nSwagger docs: http://localhost:5000/api/docs",
+    "description": "Learning API for the React e-commerce project.\n\n1. Import this collection **and** the environment file.\n2. Select the **ShopNest Local** environment (top right).\n3. Run **Auth → Login (demo user)** first — the token is saved automatically into `{{token}}`.\n4. Age Groups → *Get age groups* saves `{{ageGroupId}}`; Products → *Get products* saves the first product id into `{{productId}}` for the detail requests.\n\nSwagger docs: http://localhost:5000/api/docs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -389,7 +389,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/products?page=1&limit=12&sort=newest&category=smartphones&minPrice=1000&maxPrice=50000&minRating=4&brand=Nexa&inStock=true&featured=true",
+              "raw": "{{baseUrl}}/products?page=1&limit=12&sort=newest",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -411,17 +411,22 @@
                 },
                 {
                   "key": "category",
-                  "value": "smartphones",
+                  "value": "feeding-essentials",
+                  "disabled": true
+                },
+                {
+                  "key": "ageGroup",
+                  "value": "newborn",
                   "disabled": true
                 },
                 {
                   "key": "minPrice",
-                  "value": "1000",
+                  "value": "300",
                   "disabled": true
                 },
                 {
                   "key": "maxPrice",
-                  "value": "50000",
+                  "value": "2000",
                   "disabled": true
                 },
                 {
@@ -431,7 +436,7 @@
                 },
                 {
                   "key": "brand",
-                  "value": "Nexa",
+                  "value": "Little Nest",
                   "disabled": true
                 },
                 {
@@ -446,7 +451,7 @@
                 }
               ]
             },
-            "description": "Tick the disabled query params to try filters. sort: newest | oldest | price_asc | price_desc | rating | popular | title_asc | title_desc | discount",
+            "description": "Tick the disabled query params to try filters. ageGroup: newborn | infant | toddler | preschool. sort: newest | oldest | price_asc | price_desc | rating | popular | title_asc | title_desc | discount",
             "auth": {
               "type": "noauth"
             }
@@ -508,12 +513,54 @@
           ]
         },
         {
+          "name": "Shop by age (products?ageGroup=)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"success is true\", () => pm.expect(pm.response.json().success).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Same as Get products, filtered by age group slug.",
+            "url": {
+              "raw": "{{baseUrl}}/products?ageGroup=newborn&limit=12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "ageGroup",
+                  "value": "newborn"
+                },
+                {
+                  "key": "limit",
+                  "value": "12"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Search products",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/products/search?q=shirt&page=1&limit=10",
+              "raw": "{{baseUrl}}/products/search?q=teddy&page=1&limit=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -524,7 +571,7 @@
               "query": [
                 {
                   "key": "q",
-                  "value": "shirt"
+                  "value": "teddy"
                 },
                 {
                   "key": "page",
@@ -738,10 +785,10 @@
                 "products"
               ]
             },
-            "description": "Run *Login (admin)* and *Get categories* first (they fill `adminToken` and `categoryId`).",
+            "description": "Run *Login (admin)*, *Get categories* and *Get age groups* first (they fill `adminToken`, `categoryId` and `ageGroupId`).",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Wireless Gaming Mouse\",\n  \"description\": \"Ergonomic wireless mouse with 16000 DPI sensor.\",\n  \"brand\": \"ProPlay\",\n  \"price\": 1499,\n  \"mrp\": 2499,\n  \"categoryId\": \"{{categoryId}}\",\n  \"stock\": 50,\n  \"thumbnail\": \"https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods/thumbnail.webp\",\n  \"tags\": [\n    \"mouse\",\n    \"gaming\"\n  ]\n}",
+              "raw": "{\n  \"title\": \"Organic Cotton Bandana Bibs (Pack of 5)\",\n  \"description\": \"Absorbent organic cotton bibs with a soft fleece backing.\",\n  \"brand\": \"Little Nest\",\n  \"price\": 599,\n  \"mrp\": 799,\n  \"categoryId\": \"{{categoryId}}\",\n  \"ageGroupIds\": [\n    \"{{ageGroupId}}\"\n  ],\n  \"stock\": 50,\n  \"thumbnail\": \"https://images.pexels.com/photos/3875082/pexels-photo-3875082.jpeg?auto=compress&cs=tinysrgb&w=600\",\n  \"tags\": [\n    \"bib\",\n    \"organic cotton\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -959,13 +1006,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/categories/laptops",
+              "raw": "{{baseUrl}}/categories/feeding-essentials",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "categories",
-                "laptops"
+                "feeding-essentials"
               ]
             },
             "auth": {
@@ -991,13 +1038,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/categories/laptops/products?page=1&limit=12&sort=price_asc",
+              "raw": "{{baseUrl}}/categories/feeding-essentials/products?page=1&limit=12&sort=price_asc",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "categories",
-                "laptops",
+                "feeding-essentials",
                 "products"
               ],
               "query": [
@@ -1031,6 +1078,159 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Age Groups",
+      "item": [
+        {
+          "name": "Get age groups (Shop by Age)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"success is true\", () => pm.expect(pm.response.json().success).to.be.true);",
+                  "const a = pm.response.json().data.ageGroups[0];",
+                  "if (a) { pm.environment.set(\"ageGroupId\", a.id); pm.environment.set(\"ageGroupSlug\", a.slug); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/age-groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "age-groups"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get age group by slug",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"success is true\", () => pm.expect(pm.response.json().success).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/age-groups/toddler",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "age-groups",
+                "toddler"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Products for an age group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"success is true\", () => pm.expect(pm.response.json().success).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/age-groups/newborn/products?page=1&limit=12&sort=price_asc&category=feeding-essentials",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "age-groups",
+                "newborn",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "12"
+                },
+                {
+                  "key": "sort",
+                  "value": "price_asc"
+                },
+                {
+                  "key": "category",
+                  "value": "feeding-essentials",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Age group – not found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/age-groups/teen",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "age-groups",
+                "teen"
+              ]
+            }
+          }
         }
       ]
     }

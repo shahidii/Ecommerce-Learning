@@ -1,97 +1,316 @@
-// Product images are served from the free dummyjson.com CDN.
-// p(categorySlug, cdnPath, imageCount, fields) builds one product object.
-const CDN = "https://cdn.dummyjson.com/product-images";
+// Little Nest baby store catalogue.
+// p(categorySlug, ageGroupSlugs, pexelsPhotoIds, fields) builds one product.
+//   - category / ageGroups are slugs here → seed.js turns them into ObjectIds
+//   - the first photo id is the thumbnail; all ids become the gallery
+const pexels = require("./pexels");
 
-const p = (category, path, imageCount, fields) => ({
-    category, // category slug → converted to an ObjectId by seed.js
-    thumbnail: `${CDN}/${path}/thumbnail.webp`,
-    images: Array.from({ length: imageCount }, (_, i) => `${CDN}/${path}/${i + 1}.webp`),
+const p = (category, ageGroups, photoIds, fields) => ({
+    category,
+    ageGroups,
+    thumbnail: pexels(photoIds[0], 600),
+    images: photoIds.map((id) => pexels(id, 1200)),
     ...fields,
 });
 
 const specs = (obj) => Object.entries(obj).map(([label, value]) => ({ label, value }));
 
+const ALL_AGES = ["newborn", "infant", "toddler", "preschool"];
+
 module.exports = [
-    // ─── Smartphones ─────────────────────────────────────
-    p("smartphones", "smartphones/iphone-13-pro", 3, { title: "Nexa 13 Pro (128 GB, Graphite)", brand: "Nexa", price: 79999, mrp: 89999, rating: 4.7, reviewsCount: 2341, stock: 25, isFeatured: true, tags: ["5g", "flagship", "camera"], description: "A flagship phone with a 6.1-inch 120Hz OLED display, triple 12 MP pro camera system, cinematic video mode and all-day battery life.", specifications: specs({ Display: "6.1\" OLED, 120Hz", Storage: "128 GB", Camera: "12 MP + 12 MP + 12 MP", Battery: "3095 mAh", OS: "NexaOS 17" }) }),
-    p("smartphones", "smartphones/samsung-galaxy-s10", 3, { title: "Orbit S10 (8 GB / 128 GB, Prism White)", brand: "Orbit", price: 34999, mrp: 44999, rating: 4.4, reviewsCount: 1820, stock: 40, tags: ["android", "amoled"], description: "Dynamic AMOLED display, ultrasonic in-display fingerprint scanner, wireless power share and a versatile triple camera.", specifications: specs({ Display: "6.1\" Dynamic AMOLED", RAM: "8 GB", Storage: "128 GB", Battery: "3400 mAh" }) }),
-    p("smartphones", "smartphones/oppo-f19-pro-plus", 3, { title: "Volt F19 Pro+ 5G (8 GB / 128 GB)", brand: "Volt", price: 21990, mrp: 25990, rating: 4.2, reviewsCount: 964, stock: 60, tags: ["5g", "fast-charging"], description: "Slim 5G phone with 50W flash charging, a 48 MP quad camera and AI night portrait mode.", specifications: specs({ Display: "6.4\" AMOLED", RAM: "8 GB", Charging: "50W Flash Charge", Battery: "4310 mAh" }) }),
-    p("smartphones", "smartphones/realme-xt", 3, { title: "Pixelon XT (64 MP Quad Camera)", brand: "Pixelon", price: 15999, mrp: 18999, rating: 4.3, reviewsCount: 3120, stock: 0, tags: ["budget", "camera"], description: "Budget-friendly phone with a 64 MP quad camera, Super AMOLED screen and 20W fast charging. Currently out of stock.", specifications: specs({ Display: "6.4\" Super AMOLED", Camera: "64 MP Quad", Battery: "4000 mAh" }) }),
-    p("smartphones", "smartphones/vivo-x21", 3, { title: "Vista X21 (In-Display Fingerprint)", brand: "Vista", price: 18490, mrp: 23990, rating: 4.1, reviewsCount: 712, stock: 18, tags: ["android", "fingerprint"], description: "Sleek phone with an in-display fingerprint sensor, dual rear camera and a bright 6.28-inch Super AMOLED display.", specifications: specs({ Display: "6.28\" Super AMOLED", RAM: "6 GB", Storage: "128 GB" }) }),
-    p("smartphones", "smartphones/iphone-x", 3, { title: "Nexa X (64 GB, Space Grey)", brand: "Nexa", price: 32999, mrp: 39999, rating: 4.5, reviewsCount: 5210, stock: 12, tags: ["ios", "face-unlock"], description: "All-screen design with a 5.8-inch Super Retina display, face unlock and dual 12 MP cameras.", specifications: specs({ Display: "5.8\" OLED", Storage: "64 GB", Camera: "12 MP Dual" }) }),
+    // ─── Organic Clothing ────────────────────────────────
+    p("organic-clothing", ["newborn", "infant"], [5982301, 3845156, 29015875], {
+        title: "Organic Cotton Onesie – Pack of 3 (White)", brand: "Little Nest",
+        price: 899, mrp: 1299, rating: 4.7, reviewsCount: 1284, stock: 120, isFeatured: true,
+        tags: ["onesie", "bodysuit", "organic cotton", "unisex"],
+        description: "Everyday bodysuits made from GOTS-certified organic cotton. Envelope neck for easy dressing, nickel-free snap buttons and flat seams that are kind to delicate skin.",
+        specifications: specs({ Material: "100% organic cotton", Pack: "3 bodysuits", Closure: "Snap buttons", Care: "Machine wash cold" }),
+    }),
+    p("organic-clothing", ["newborn", "infant"], [6849436, 3875233], {
+        title: "Checkered Zip Sleepsuit", brand: "Cotton Cub",
+        price: 749, mrp: 999, rating: 4.5, reviewsCount: 642, stock: 80,
+        tags: ["sleepsuit", "romper", "zip", "unisex"],
+        description: "A full-length sleepsuit with a two-way zip for quick night-time changes. Fold-over mitten cuffs stop little scratches.",
+        specifications: specs({ Material: "Organic cotton jersey", Closure: "Two-way zip", Feet: "Footed" }),
+    }),
+    p("organic-clothing", ["newborn"], [3875082, 7484842, 7055886], {
+        title: "Newborn Essentials Gift Set (Bodysuits & Bibs)", brand: "Little Nest",
+        price: 1599, mrp: 2199, rating: 4.8, reviewsCount: 517, stock: 45, isFeatured: true,
+        tags: ["gift set", "newborn", "bib", "bodysuit"],
+        description: "The perfect baby shower gift: two bodysuits, two bibs and a cap in soft organic cotton, packed in a reusable keepsake box.",
+        specifications: specs({ Includes: "2 bodysuits, 2 bibs, 1 cap", Material: "Organic cotton", Size: "0–3 months" }),
+    }),
+    p("organic-clothing", ["newborn", "infant"], [39462003, 17773456], {
+        title: "Hand-Knit Wool Booties (Cream)", brand: "Woolly Wonders",
+        price: 549, mrp: 799, rating: 4.6, reviewsCount: 389, stock: 60,
+        tags: ["booties", "knit", "wool", "winter"],
+        description: "Hand-knitted merino booties with a ribbon tie that keeps them on wriggly feet. Warm, breathable and soft.",
+        specifications: specs({ Material: "Merino wool", Sizes: "0–6 months, 6–12 months", Care: "Hand wash" }),
+    }),
+    p("organic-clothing", ["infant"], [32890761, 36848834], {
+        title: "Knitted Bear-Ear Romper", brand: "Woolly Wonders",
+        price: 1299, mrp: 1799, rating: 4.7, reviewsCount: 274, stock: 35,
+        tags: ["romper", "knit", "winter", "bear"],
+        description: "A cosy knitted romper with an adorable bear-ear hood. Snap opening at the legs for easy nappy changes.",
+        specifications: specs({ Material: "Cotton-wool blend knit", Closure: "Leg snaps", Season: "Autumn / Winter" }),
+    }),
+    p("organic-clothing", ["infant", "toddler"], [35335057, 26219975], {
+        title: "Cosy Knit Sweater", brand: "Cotton Cub",
+        price: 999, mrp: 1399, rating: 4.4, reviewsCount: 198, stock: 50,
+        tags: ["sweater", "knit", "winter"],
+        description: "A classic chunky-knit sweater with shoulder buttons so it slips easily over little heads.",
+        specifications: specs({ Material: "Organic cotton knit", Neck: "Shoulder button opening", Sizes: "6 months – 3 years" }),
+    }),
+    p("organic-clothing", ["infant", "toddler"], [28259749, 34121887], {
+        title: "Animal Print Jumpsuit", brand: "Tiny Toes",
+        price: 849, mrp: 1199, rating: 4.3, reviewsCount: 156, stock: 0,
+        tags: ["jumpsuit", "animal print", "playwear"],
+        description: "A playful all-in-one with a friendly animal print, roomy fit for crawling and stretchy cuffs. Currently out of stock.",
+        specifications: specs({ Material: "Cotton jersey", Fit: "Relaxed", Sizes: "6 months – 2 years" }),
+    }),
+    p("organic-clothing", ["toddler", "preschool"], [18862066, 39877366], {
+        title: "Toddler Denim Jacket & Skirt Set", brand: "Tiny Toes",
+        price: 1499, mrp: 2199, rating: 4.5, reviewsCount: 121, stock: 25,
+        tags: ["denim", "jacket", "skirt", "girls"],
+        description: "A soft-washed denim jacket with a matching twirl skirt. Elastic waist for comfort and easy dressing.",
+        specifications: specs({ Material: "Soft cotton denim", Includes: "Jacket + skirt", Sizes: "2 – 5 years" }),
+    }),
 
-    // ─── Laptops ─────────────────────────────────────────
-    p("laptops", "laptops/apple-macbook-pro-14-inch-space-grey", 3, { title: "AeroBook Pro 14\" (16 GB RAM, 512 GB SSD)", brand: "Aero", price: 169900, mrp: 194900, rating: 4.8, reviewsCount: 1288, stock: 10, isFeatured: true, tags: ["laptop", "pro", "creator"], description: "A pro laptop with a Liquid Retina XDR display, up to 18 hours of battery life and a powerful 10-core processor for developers and creators.", specifications: specs({ Display: "14.2\" XDR, 120Hz", RAM: "16 GB", Storage: "512 GB SSD", Battery: "Up to 18 hrs", Weight: "1.6 kg" }) }),
-    p("laptops", "laptops/asus-zenbook-pro-dual-screen-laptop", 3, { title: "Zenith Duo 15 Dual-Screen Laptop", brand: "Zenith", price: 139990, mrp: 164990, rating: 4.5, reviewsCount: 402, stock: 6, tags: ["laptop", "dual-screen", "creator"], description: "Dual-screen productivity laptop with a 15.6-inch 4K OLED main display and a 14-inch secondary touchscreen.", specifications: specs({ Display: "15.6\" 4K OLED + 14\" ScreenPad", RAM: "32 GB", Storage: "1 TB SSD", GPU: "RTX 3070" }) }),
-    p("laptops", "laptops/huawei-matebook-x-pro", 3, { title: "Matrix X Pro 13.9\" Touch Laptop", brand: "Matrix", price: 89990, mrp: 109990, rating: 4.4, reviewsCount: 655, stock: 14, tags: ["laptop", "touchscreen", "ultrabook"], description: "Premium ultrabook with a 3K FullView touchscreen, aluminium body and a pop-up privacy webcam.", specifications: specs({ Display: "13.9\" 3K Touch", RAM: "16 GB", Storage: "1 TB SSD", Weight: "1.33 kg" }) }),
-    p("laptops", "laptops/lenovo-yoga-920", 3, { title: "Flex 920 2-in-1 Convertible Laptop", brand: "Flex", price: 74990, mrp: 92990, rating: 4.3, reviewsCount: 890, stock: 20, tags: ["laptop", "2-in-1", "touchscreen"], description: "Convertible laptop with a 360° hinge, pen support and a 13.9-inch touch display — laptop, tent and tablet in one.", specifications: specs({ Display: "13.9\" FHD Touch", RAM: "8 GB", Storage: "512 GB SSD" }) }),
-    p("laptops", "laptops/new-dell-xps-13-9300-laptop", 3, { title: "Ultra 13 InfinityEdge Laptop", brand: "Ultra", price: 104990, mrp: 124990, rating: 4.6, reviewsCount: 1034, stock: 9, tags: ["laptop", "ultrabook"], description: "Compact 13-inch laptop with a near-borderless InfinityEdge display, CNC aluminium build and a backlit keyboard.", specifications: specs({ Display: "13.4\" FHD+", RAM: "16 GB", Storage: "512 GB SSD", Weight: "1.2 kg" }) }),
+    // ─── Feeding Essentials ──────────────────────────────
+    p("feeding-essentials", ["newborn", "infant"], [374756, 8430572, 7282619], {
+        title: "Anti-Colic Feeding Bottle 260 ml", brand: "Little Nest",
+        price: 499, mrp: 699, rating: 4.6, reviewsCount: 2310, stock: 150, isFeatured: true,
+        tags: ["bottle", "anti-colic", "bpa free", "milk"],
+        description: "A vented anti-colic bottle that reduces air intake and tummy troubles. Wide neck for easy filling and cleaning.",
+        specifications: specs({ Capacity: "260 ml", Material: "BPA-free PP", Teat: "Slow flow silicone", Dishwasher: "Top rack safe" }),
+    }),
+    p("feeding-essentials", ["newborn"], [6849544, 7282318, 33508363], {
+        title: "Wide-Neck Glass Feeding Bottle 150 ml", brand: "PureSip",
+        price: 649, mrp: 899, rating: 4.5, reviewsCount: 864, stock: 70,
+        tags: ["bottle", "glass", "newborn", "milk"],
+        description: "Borosilicate glass bottle with a protective silicone sleeve. Plastic-free, odour-free and safe to sterilise.",
+        specifications: specs({ Capacity: "150 ml", Material: "Borosilicate glass + silicone sleeve", Teat: "Newborn flow" }),
+    }),
+    p("feeding-essentials", ["newborn", "infant"], [11501481], {
+        title: "Formula Dispenser & Measuring Scoop Set", brand: "PureSip",
+        price: 349, mrp: 499, rating: 4.2, reviewsCount: 412, stock: 90,
+        tags: ["formula", "dispenser", "travel"],
+        description: "Three stackable compartments for pre-measured formula on the go, with a levelling scoop for accurate feeds.",
+        specifications: specs({ Compartments: "3", Material: "BPA-free PP", Includes: "Levelling scoop" }),
+    }),
+    p("feeding-essentials", ["infant", "toddler"], [3716516, 7946746, 7491116], {
+        title: "Convertible Wooden High Chair", brand: "Nest & Grow",
+        price: 7999, mrp: 10999, rating: 4.8, reviewsCount: 286, stock: 12, isFeatured: true,
+        tags: ["high chair", "wooden", "convertible", "weaning"],
+        description: "A beech-wood high chair that grows from baby to big kid. Removable tray, 5-point harness and adjustable footrest.",
+        specifications: specs({ Material: "Solid beech wood", Harness: "5-point", Age: "6 months – 5 years", "Max load": "25 kg" }),
+    }),
+    p("feeding-essentials", ["infant", "toddler"], [4409245, 4409276, 7946745], {
+        title: "Silicone Weaning Spoon Set (Pack of 4)", brand: "Little Nest",
+        price: 399, mrp: 549, rating: 4.6, reviewsCount: 978, stock: 140,
+        tags: ["spoon", "weaning", "silicone", "first foods"],
+        description: "Soft-tip silicone spoons that are gentle on gums, with short handles that are easy for little hands to hold.",
+        specifications: specs({ Pack: "4 spoons", Material: "Food-grade silicone", Dishwasher: "Safe" }),
+    }),
+    p("feeding-essentials", ["infant", "toddler"], [7491105, 5083238], {
+        title: "Suction Bowl & Plate Set", brand: "Nest & Grow",
+        price: 699, mrp: 999, rating: 4.4, reviewsCount: 503, stock: 75,
+        tags: ["bowl", "plate", "suction", "weaning"],
+        description: "Strong suction bases keep bowls and plates on the table, not the floor. Microwave and dishwasher safe.",
+        specifications: specs({ Includes: "1 bowl, 1 divided plate", Material: "Food-grade silicone", Microwave: "Safe" }),
+    }),
+    p("feeding-essentials", ["infant", "toddler"], [11787679, 26337070, 33094010], {
+        title: "Waterproof Feeding Bibs (Pack of 3)", brand: "Tiny Toes",
+        price: 449, mrp: 649, rating: 4.3, reviewsCount: 667, stock: 0,
+        tags: ["bib", "waterproof", "mess-free"],
+        description: "Wipe-clean bibs with a deep crumb catcher pocket for messy weaning adventures. Currently out of stock.",
+        specifications: specs({ Pack: "3 bibs", Material: "Waterproof PEVA", Closure: "Adjustable snaps" }),
+    }),
+    p("feeding-essentials", ["toddler", "preschool"], [17781076, 9305088], {
+        title: "Toddler Snack Cup & Fruit Bowl", brand: "PureSip",
+        price: 399, mrp: 599, rating: 4.4, reviewsCount: 341, stock: 95,
+        tags: ["snack cup", "bowl", "toddler", "spill-proof"],
+        description: "A spill-resistant snack cup and a lightweight fruit bowl for independent snacking at home or on the go.",
+        specifications: specs({ Includes: "Snack cup + bowl", Material: "BPA-free PP", Lid: "Soft flap lid" }),
+    }),
 
-    // ─── Gadgets & Audio ─────────────────────────────────
-    p("gadgets-audio", "mobile-accessories/apple-airpods-max-silver", 1, { title: "SoundMax Over-Ear Wireless Headphones (Silver)", brand: "SoundMax", price: 19999, mrp: 24999, rating: 4.6, reviewsCount: 1502, stock: 30, isFeatured: true, tags: ["headphones", "wireless", "anc"], description: "Over-ear headphones with active noise cancellation, transparency mode and spatial audio. Up to 20 hours of listening.", specifications: specs({ Type: "Over-ear", ANC: "Yes", Battery: "20 hrs", Connectivity: "Bluetooth 5.3" }) }),
-    p("gadgets-audio", "mobile-accessories/apple-airpods", 3, { title: "Pods True Wireless Earbuds", brand: "SoundMax", price: 8999, mrp: 12999, rating: 4.4, reviewsCount: 4380, stock: 75, tags: ["earbuds", "wireless"], description: "True wireless earbuds with one-tap pairing, quick charge and a pocket-size charging case.", specifications: specs({ Type: "In-ear", Battery: "5 hrs (24 hrs with case)", Connectivity: "Bluetooth 5.0" }) }),
-    p("gadgets-audio", "mobile-accessories/beats-flex-wireless-earphones", 1, { title: "Flex Neckband Wireless Earphones", brand: "Beatline", price: 2499, mrp: 3999, rating: 4.1, reviewsCount: 2210, stock: 120, tags: ["earphones", "neckband", "wireless"], description: "Lightweight neckband earphones with magnetic earbuds, 12-hour battery and fast fuel charging.", specifications: specs({ Type: "Neckband", Battery: "12 hrs" }) }),
-    p("gadgets-audio", "mobile-accessories/apple-watch-series-4-gold", 3, { title: "Pulse Smartwatch Series 4 (Gold)", brand: "Pulse", price: 14999, mrp: 19999, rating: 4.3, reviewsCount: 980, stock: 22, tags: ["smartwatch", "fitness"], description: "Smartwatch with ECG, fall detection, heart-rate tracking and a bright always-on display.", specifications: specs({ Display: "1.78\" AMOLED", "Water Resistance": "50 m", Battery: "18 hrs" }) }),
-    p("gadgets-audio", "mobile-accessories/amazon-echo-plus", 2, { title: "EchoHome Smart Speaker with Voice Assistant", brand: "EchoHome", price: 6499, mrp: 9999, rating: 4.2, reviewsCount: 3560, stock: 45, tags: ["speaker", "smart-home"], description: "Smart speaker with a built-in smart home hub, 360° sound and hands-free voice control.", specifications: specs({ Speaker: "360° audio", Connectivity: "Wi-Fi, Bluetooth, Zigbee" }) }),
-    p("gadgets-audio", "tablets/ipad-mini-2021-starlight", 4, { title: "Slate Mini 8.3\" Tablet (Starlight)", brand: "Nexa", price: 42900, mrp: 49900, rating: 4.7, reviewsCount: 610, stock: 16, tags: ["tablet", "compact"], description: "Compact 8.3-inch tablet with a Liquid Retina display, stylus support and 5G connectivity.", specifications: specs({ Display: "8.3\" Liquid Retina", Storage: "64 GB", Connectivity: "Wi-Fi + 5G" }) }),
-    p("gadgets-audio", "tablets/samsung-galaxy-tab-s8-plus-grey", 4, { title: "Orbit Tab S8+ 12.4\" AMOLED Tablet", brand: "Orbit", price: 64999, mrp: 79999, rating: 4.5, reviewsCount: 433, stock: 11, tags: ["tablet", "amoled", "stylus"], description: "Large 12.4-inch Super AMOLED tablet with S-Pen included, quad speakers and a long-lasting battery.", specifications: specs({ Display: "12.4\" Super AMOLED", RAM: "8 GB", Storage: "128 GB", Battery: "10090 mAh" }) }),
+    // ─── Sleep & Nursery ─────────────────────────────────
+    p("sleep-nursery", ["newborn", "infant", "toddler"], [3875085, 7937988, 37185810], {
+        title: "Classic White Wooden Crib", brand: "Nest & Grow",
+        price: 14999, mrp: 19999, rating: 4.8, reviewsCount: 214, stock: 8, isFeatured: true,
+        tags: ["crib", "cot", "wooden", "nursery"],
+        description: "A timeless solid-wood crib with three mattress heights and smooth rounded edges. Converts to a toddler bed.",
+        specifications: specs({ Material: "Solid pine, non-toxic paint", "Mattress size": "120 × 60 cm", "Mattress heights": "3", Converts: "Toddler bed" }),
+    }),
+    p("sleep-nursery", ["newborn", "infant", "toddler"], [11116578, 4964347], {
+        title: "Natural Wood Crib with Soft Toy Set", brand: "Nest & Grow",
+        price: 12999, mrp: 16999, rating: 4.6, reviewsCount: 132, stock: 6,
+        tags: ["crib", "cot", "natural wood", "soft toys"],
+        description: "A natural-finish wooden crib bundled with three soft nursery toys. Breathable slatted sides for airflow.",
+        specifications: specs({ Material: "Natural beech wood", "Mattress size": "120 × 60 cm", Includes: "3 soft toys" }),
+    }),
+    p("sleep-nursery", ["newborn", "infant"], [4886923, 12603180], {
+        title: "Pastel Crib Bedding Set (Pink)", brand: "Little Nest",
+        price: 2499, mrp: 3299, rating: 4.5, reviewsCount: 188, stock: 30,
+        tags: ["bedding", "crib sheet", "pink", "nursery"],
+        description: "Fitted sheet, quilt and pillowcase in breathable organic cotton, in a soft blush pink.",
+        specifications: specs({ Includes: "Fitted sheet, quilt, pillowcase", Material: "Organic cotton percale", Fits: "120 × 60 cm crib" }),
+    }),
+    p("sleep-nursery", ["newborn"], [4964233, 14476030, 971435], {
+        title: "Muslin Swaddle Blankets (Pack of 3)", brand: "Little Nest",
+        price: 1199, mrp: 1599, rating: 4.9, reviewsCount: 1532, stock: 85, isFeatured: true,
+        tags: ["swaddle", "muslin", "blanket", "newborn"],
+        description: "Large, airy muslin swaddles that get softer with every wash. Also great as a nursing cover or play mat.",
+        specifications: specs({ Pack: "3 swaddles", Size: "120 × 120 cm", Material: "Organic cotton muslin" }),
+    }),
+    p("sleep-nursery", ALL_AGES, [4886918, 4887115, 4886896], {
+        title: "Soft Knit Throw Blanket", brand: "Woolly Wonders",
+        price: 1499, mrp: 1999, rating: 4.6, reviewsCount: 402, stock: 40,
+        tags: ["blanket", "knit", "nursery", "throw"],
+        description: "A chunky cable-knit blanket for the pram, the crib or snuggling on the sofa.",
+        specifications: specs({ Size: "100 × 80 cm", Material: "Cotton knit", Care: "Machine wash gentle" }),
+    }),
+    p("sleep-nursery", ["newborn", "infant"], [36276505, 4964347], {
+        title: "Woodland Cot Mobile", brand: "Nest & Grow",
+        price: 1799, mrp: 2499, rating: 4.4, reviewsCount: 96, stock: 20,
+        tags: ["mobile", "cot", "nursery decor", "felt"],
+        description: "Hand-made felt woodland animals that turn gently above the cot to calm and entertain.",
+        specifications: specs({ Material: "Wool felt + beech arm", Mount: "Clamps to most cots", Batteries: "Not required" }),
+    }),
+    p("sleep-nursery", ["infant", "toddler"], [4964228, 36845894, 19399028], {
+        title: "Baby Sleeping Bag 2.5 TOG", brand: "Little Nest",
+        price: 1899, mrp: 2599, rating: 4.7, reviewsCount: 611, stock: 55,
+        tags: ["sleeping bag", "sleep sack", "safe sleep"],
+        description: "A wearable blanket that keeps baby warm without loose bedding. Two-way zip and shoulder snaps.",
+        specifications: specs({ TOG: "2.5 (room 16–20 °C)", Material: "Organic cotton, recycled fill", Sizes: "6–18 months, 18–36 months" }),
+    }),
+    p("sleep-nursery", ["newborn", "infant"], [4964298, 4964220], {
+        title: "Elephant Comforter & Lovey", brand: "Tiny Toes",
+        price: 699, mrp: 999, rating: 4.8, reviewsCount: 733, stock: 70,
+        tags: ["lovey", "comforter", "elephant", "soft toy"],
+        description: "A soft elephant comforter with a little blanket body, perfect for helping baby settle to sleep.",
+        specifications: specs({ Size: "30 × 30 cm", Material: "Organic cotton plush", Safety: "Embroidered eyes" }),
+    }),
 
-    // ─── Men's Fashion ───────────────────────────────────
-    p("mens-fashion", "mens-shirts/man-plaid-shirt", 4, { title: "Men's Classic Plaid Cotton Shirt", brand: "Urban Thread", price: 899, mrp: 1799, rating: 4.2, reviewsCount: 1450, stock: 80, tags: ["shirt", "cotton", "casual"], description: "Regular-fit plaid shirt made from breathable 100% cotton. Perfect for casual outings.", specifications: specs({ Fabric: "100% Cotton", Fit: "Regular", Sleeve: "Full" }) }),
-    p("mens-fashion", "mens-shirts/men-check-shirt", 4, { title: "Men's Slim Fit Check Shirt", brand: "Urban Thread", price: 749, mrp: 1499, rating: 4.0, reviewsCount: 980, stock: 65, tags: ["shirt", "slim-fit", "formal"], description: "Slim fit check shirt with a spread collar — smart enough for office, relaxed enough for weekends.", specifications: specs({ Fabric: "Cotton Blend", Fit: "Slim", Sleeve: "Full" }) }),
-    p("mens-fashion", "mens-shirts/man-short-sleeve-shirt", 4, { title: "Men's Short Sleeve Casual Shirt", brand: "Coastline", price: 649, mrp: 1299, rating: 3.9, reviewsCount: 540, stock: 50, tags: ["shirt", "summer", "casual"], description: "Lightweight short sleeve shirt for hot summer days.", specifications: specs({ Fabric: "Linen Blend", Fit: "Regular", Sleeve: "Half" }) }),
-    p("mens-fashion", "mens-shoes/nike-air-jordan-1-red-and-black", 4, { title: "High-Top Basketball Sneakers (Red/Black)", brand: "Stride", price: 7999, mrp: 11999, rating: 4.6, reviewsCount: 2210, stock: 15, isFeatured: true, tags: ["sneakers", "shoes", "high-top"], description: "Iconic high-top sneakers with a leather upper, cushioned sole and classic red and black colourway.", specifications: specs({ Upper: "Leather", Sole: "Rubber", Closure: "Lace-up" }) }),
-    p("mens-fashion", "mens-shoes/puma-future-rider-trainers", 4, { title: "Retro Runner Trainers", brand: "Stride", price: 3499, mrp: 5999, rating: 4.3, reviewsCount: 860, stock: 35, tags: ["shoes", "running", "retro"], description: "Retro-inspired running trainers with a soft foam midsole and grippy rubber outsole.", specifications: specs({ Upper: "Mesh + Suede", Sole: "Rubber" }) }),
-    p("mens-fashion", "mens-shoes/sports-sneakers-off-white-red", 4, { title: "Everyday Sports Sneakers (Off-White/Red)", brand: "Kicks", price: 1999, mrp: 3499, rating: 4.0, reviewsCount: 1320, stock: 70, tags: ["sneakers", "shoes", "sports"], description: "Comfortable everyday sneakers for walking, gym and casual wear.", specifications: specs({ Upper: "Synthetic", Sole: "EVA" }) }),
+    // ─── Bath & Skincare ─────────────────────────────────
+    p("bath-skincare", ["newborn", "infant"], [914253, 6849435, 6849414], {
+        title: "Foldable Baby Bathtub", brand: "SplashTime",
+        price: 2299, mrp: 2999, rating: 4.6, reviewsCount: 455, stock: 25, isFeatured: true,
+        tags: ["bathtub", "foldable", "bath"],
+        description: "A space-saving bathtub that folds flat. Non-slip feet, a drain plug and a supportive newborn sling.",
+        specifications: specs({ Material: "BPA-free PP + TPE", Folded: "8 cm thin", Includes: "Newborn sling" }),
+    }),
+    p("bath-skincare", ["newborn", "infant"], [6849411], {
+        title: "Digital Bath Thermometer", brand: "SplashTime",
+        price: 499, mrp: 699, rating: 4.3, reviewsCount: 287, stock: 60,
+        tags: ["thermometer", "bath", "safety"],
+        description: "Shows the water temperature in seconds and flashes when the bath is too hot or too cold.",
+        specifications: specs({ Range: "0–50 °C", Display: "Digital with warning light", Battery: "Included" }),
+    }),
+    p("bath-skincare", ["infant", "toddler", "preschool"], [20509000, 20509001], {
+        title: "Hooded Bath Towel & Bathrobe Set", brand: "Little Nest",
+        price: 1299, mrp: 1799, rating: 4.7, reviewsCount: 342, stock: 40,
+        tags: ["towel", "bathrobe", "hooded", "bamboo"],
+        description: "An ultra-absorbent bamboo-cotton hooded towel and a matching robe for snuggly after-bath cuddles.",
+        specifications: specs({ Material: "Bamboo-cotton terry", Includes: "Hooded towel + bathrobe", Sizes: "1 – 5 years" }),
+    }),
+    p("bath-skincare", ALL_AGES, [8533228, 6847856, 38334623], {
+        title: "Gentle Baby Lotion 200 ml", brand: "PureBub",
+        price: 349, mrp: 449, rating: 4.5, reviewsCount: 1876, stock: 200,
+        tags: ["lotion", "moisturiser", "skincare", "fragrance free"],
+        description: "A light, fast-absorbing lotion with shea butter and oat. Fragrance-free and dermatologist tested.",
+        specifications: specs({ Volume: "200 ml", "Key ingredients": "Shea butter, colloidal oat", "Fragrance free": "Yes" }),
+    }),
+    p("bath-skincare", ["newborn", "infant"], [34718061, 34233828], {
+        title: "Natural Baby Care Gift Basket", brand: "PureBub",
+        price: 1999, mrp: 2799, rating: 4.8, reviewsCount: 219, stock: 18,
+        tags: ["gift set", "skincare", "natural", "basket"],
+        description: "Wash, shampoo, lotion, nappy balm and a muslin cloth in a woven basket. A lovely new-baby gift.",
+        specifications: specs({ Includes: "Wash, shampoo, lotion, balm, muslin cloth", Basket: "Handwoven seagrass" }),
+    }),
+    p("bath-skincare", ALL_AGES, [24538694, 22863908, 8909871], {
+        title: "Tear-Free Baby Shampoo & Wash 300 ml", brand: "PureBub",
+        price: 399, mrp: 499, rating: 4.6, reviewsCount: 1420, stock: 180,
+        tags: ["shampoo", "body wash", "tear free", "bath"],
+        description: "A 2-in-1 hair and body wash with a mild, tear-free formula and a gentle lavender scent.",
+        specifications: specs({ Volume: "300 ml", Formula: "Tear-free, sulphate-free", pH: "5.5" }),
+    }),
+    p("bath-skincare", ["infant", "toddler", "preschool"], [7489743, 132464, 34691304], {
+        title: "Classic Rubber Duck Bath Set (Pack of 3)", brand: "SplashTime",
+        price: 299, mrp: 449, rating: 4.7, reviewsCount: 958, stock: 160,
+        tags: ["bath toy", "rubber duck", "floating"],
+        description: "Bath time's best friends. Sealed-bottom ducks so no water gets trapped inside.",
+        specifications: specs({ Pack: "3 ducks", Material: "Natural rubber", Mould: "Sealed, no holes" }),
+    }),
+    p("bath-skincare", ["infant", "toddler"], [37932052, 6735428, 4678303], {
+        title: "Baby Bath Basin with Toys", brand: "SplashTime",
+        price: 1499, mrp: 1999, rating: 4.2, reviewsCount: 133, stock: 0,
+        tags: ["bath basin", "bath toys", "bath"],
+        description: "A roomy bath basin for sitting babies, with a set of floating bath toys. Currently out of stock.",
+        specifications: specs({ Material: "BPA-free PP", Includes: "Basin + 4 floating toys", Age: "6 months +" }),
+    }),
 
-    // ─── Women's Fashion ─────────────────────────────────
-    p("womens-fashion", "tops/blue-frock", 4, { title: "Women's Flared Blue Frock", brand: "Bloom", price: 1099, mrp: 2199, rating: 4.1, reviewsCount: 620, stock: 40, tags: ["dress", "frock", "casual"], description: "Flowy flared frock in a soft blue shade with a comfortable fit.", specifications: specs({ Fabric: "Rayon", Length: "Knee length" }) }),
-    p("womens-fashion", "tops/girl-summer-dress", 4, { title: "Floral Summer Dress", brand: "Bloom", price: 1299, mrp: 2499, rating: 4.4, reviewsCount: 1105, stock: 55, isFeatured: true, tags: ["dress", "summer", "floral"], description: "Breezy floral summer dress — light, airy and perfect for beach days.", specifications: specs({ Fabric: "Cotton", Length: "Midi" }) }),
-    p("womens-fashion", "womens-dresses/dress-pea", 4, { title: "Pea Green Midi Dress", brand: "Elegance", price: 1799, mrp: 3299, rating: 4.2, reviewsCount: 344, stock: 20, tags: ["dress", "midi", "party"], description: "Elegant pea green midi dress for parties and evening events.", specifications: specs({ Fabric: "Polyester", Length: "Midi" }) }),
-    p("womens-fashion", "womens-bags/women-handbag-black", 3, { title: "Women's Structured Handbag (Black)", brand: "Carryall", price: 1599, mrp: 2999, rating: 4.3, reviewsCount: 790, stock: 33, tags: ["handbag", "bag", "office"], description: "Structured faux-leather handbag with multiple compartments — fits a 13-inch laptop.", specifications: specs({ Material: "Faux Leather", Compartments: "3" }) }),
-    p("womens-fashion", "womens-bags/white-faux-leather-backpack", 3, { title: "Faux Leather Mini Backpack (White)", brand: "Carryall", price: 1299, mrp: 2499, rating: 4.0, reviewsCount: 410, stock: 28, tags: ["backpack", "bag"], description: "Trendy mini backpack in white faux leather with adjustable straps.", specifications: specs({ Material: "Faux Leather", Capacity: "8 L" }) }),
-    p("womens-fashion", "womens-shoes/golden-shoes-woman", 4, { title: "Golden Party Heels", brand: "Glam", price: 1899, mrp: 3499, rating: 4.1, reviewsCount: 256, stock: 0, tags: ["heels", "shoes", "party"], description: "Shimmering golden block heels for weddings and parties. Currently out of stock.", specifications: specs({ "Heel Height": "3 inch", Material: "Synthetic" }) }),
-    p("womens-fashion", "womens-jewellery/green-oval-earring", 3, { title: "Green Oval Drop Earrings", brand: "Gemora", price: 499, mrp: 999, rating: 4.5, reviewsCount: 530, stock: 90, tags: ["earrings", "jewellery"], description: "Lightweight oval drop earrings with green stones and a gold-tone finish.", specifications: specs({ Material: "Alloy", Plating: "Gold-tone" }) }),
-
-    // ─── Home & Kitchen ──────────────────────────────────
-    p("home-kitchen", "kitchen-accessories/boxed-blender", 4, { title: "Personal Blender 600W", brand: "KitchenPro", price: 2299, mrp: 3499, rating: 4.2, reviewsCount: 1876, stock: 48, tags: ["blender", "appliance"], description: "Compact 600W blender for smoothies, shakes and chutneys with two travel jars.", specifications: specs({ Power: "600 W", Jars: "2", Warranty: "1 year" }) }),
-    p("home-kitchen", "kitchen-accessories/microwave-oven", 4, { title: "Solo Microwave Oven 20 L", brand: "KitchenPro", price: 6490, mrp: 8990, rating: 4.3, reviewsCount: 2450, stock: 19, isFeatured: true, tags: ["microwave", "appliance"], description: "20-litre solo microwave with 5 power levels, auto-cook menus and a child lock.", specifications: specs({ Capacity: "20 L", Power: "700 W", Warranty: "1 year" }) }),
-    p("home-kitchen", "kitchen-accessories/carbon-steel-wok", 1, { title: "Carbon Steel Wok 30 cm", brand: "IronChef", price: 1149, mrp: 1799, rating: 4.4, reviewsCount: 660, stock: 37, tags: ["wok", "cookware"], description: "Pre-seasoned carbon steel wok for high-heat stir frying.", specifications: specs({ Diameter: "30 cm", Material: "Carbon Steel" }) }),
-    p("home-kitchen", "kitchen-accessories/electric-stove", 4, { title: "Electric Induction Cooktop 2000W", brand: "KitchenPro", price: 2799, mrp: 4499, rating: 4.1, reviewsCount: 1320, stock: 26, tags: ["induction", "appliance"], description: "2000W induction cooktop with 7 preset Indian menus and a touch control panel.", specifications: specs({ Power: "2000 W", Presets: "7" }) }),
-    p("home-kitchen", "home-decoration/table-lamp", 1, { title: "Bedside Table Lamp (Warm White)", brand: "Lumen", price: 1199, mrp: 1999, rating: 4.3, reviewsCount: 412, stock: 44, tags: ["lamp", "decor", "lighting"], description: "Minimal bedside lamp with a fabric shade and warm white LED bulb.", specifications: specs({ Bulb: "LED 9W", Height: "40 cm" }) }),
-    p("home-kitchen", "home-decoration/plant-pot", 4, { title: "Ceramic Indoor Plant Pot", brand: "GreenNest", price: 449, mrp: 799, rating: 4.5, reviewsCount: 890, stock: 100, tags: ["pot", "decor", "plants"], description: "Glazed ceramic plant pot with a drainage hole — ideal for succulents and small indoor plants.", specifications: specs({ Material: "Ceramic", Diameter: "15 cm" }) }),
-    p("home-kitchen", "furniture/annibale-colombo-sofa", 3, { title: "3-Seater Fabric Sofa", brand: "Casa", price: 38999, mrp: 54999, rating: 4.6, reviewsCount: 210, stock: 4, tags: ["sofa", "furniture", "living-room"], description: "Spacious 3-seater sofa with high-density foam cushions and premium fabric upholstery.", specifications: specs({ Seats: "3", Material: "Fabric + Solid Wood", Warranty: "3 years" }) }),
-    p("home-kitchen", "furniture/bedside-table-african-cherry", 3, { title: "Bedside Table – Cherry Wood Finish", brand: "Casa", price: 5499, mrp: 7999, rating: 4.2, reviewsCount: 175, stock: 13, tags: ["table", "furniture", "bedroom"], description: "Compact bedside table with a drawer and open shelf in a rich cherry wood finish.", specifications: specs({ Material: "Engineered Wood", Drawers: "1" }) }),
-
-    // ─── Beauty ──────────────────────────────────────────
-    p("beauty", "beauty/essence-mascara-lash-princess", 1, { title: "Volume & Length Mascara", brand: "Glow", price: 349, mrp: 499, rating: 4.3, reviewsCount: 3420, stock: 150, tags: ["mascara", "makeup"], description: "Lengthening and volumising mascara with a cone-shaped brush. Smudge-proof and long lasting.", specifications: specs({ Shade: "Black", Volume: "12 ml" }) }),
-    p("beauty", "beauty/eyeshadow-palette-with-mirror", 1, { title: "12-Shade Eyeshadow Palette with Mirror", brand: "Glow", price: 699, mrp: 1199, rating: 4.4, reviewsCount: 1240, stock: 88, isFeatured: true, tags: ["eyeshadow", "makeup", "palette"], description: "12 highly pigmented matte and shimmer shades with a built-in mirror.", specifications: specs({ Shades: "12", Finish: "Matte + Shimmer" }) }),
-    p("beauty", "beauty/red-lipstick", 1, { title: "Matte Red Lipstick", brand: "Glow", price: 399, mrp: 599, rating: 4.2, reviewsCount: 2010, stock: 130, tags: ["lipstick", "makeup"], description: "Classic bold red lipstick with a creamy matte finish that lasts up to 8 hours.", specifications: specs({ Finish: "Matte", Weight: "4 g" }) }),
-    p("beauty", "beauty/red-nail-polish", 1, { title: "Glossy Red Nail Polish", brand: "Glow", price: 199, mrp: 299, rating: 4.0, reviewsCount: 870, stock: 200, tags: ["nail-polish", "makeup"], description: "Quick-dry glossy nail polish in a vibrant red shade.", specifications: specs({ Volume: "9 ml", Finish: "Glossy" }) }),
-    p("beauty", "skin-care/olay-ultra-moisture-shea-butter-body-wash", 3, { title: "Shea Butter Moisturising Body Wash 400 ml", brand: "PureSkin", price: 449, mrp: 599, rating: 4.5, reviewsCount: 1560, stock: 95, tags: ["body-wash", "skin-care"], description: "Creamy body wash with shea butter that cleanses and moisturises dry skin.", specifications: specs({ Volume: "400 ml", "Skin Type": "Dry" }) }),
-    p("beauty", "skin-care/attitude-super-leaves-hand-soap", 3, { title: "Natural Leaves Hand Soap", brand: "PureSkin", price: 299, mrp: 399, rating: 4.1, reviewsCount: 430, stock: 110, tags: ["hand-soap", "skin-care", "natural"], description: "Plant-based liquid hand soap with natural leaf extracts. Gentle on hands.", specifications: specs({ Volume: "473 ml" }) }),
-    p("beauty", "fragrances/calvin-klein-ck-one", 3, { title: "Unisex Citrus Eau de Toilette 100 ml", brand: "Aura", price: 2499, mrp: 3999, rating: 4.4, reviewsCount: 980, stock: 42, tags: ["perfume", "fragrance", "unisex"], description: "Fresh citrus and green tea fragrance for everyday wear, for men and women.", specifications: specs({ Volume: "100 ml", Type: "Eau de Toilette" }) }),
-
-    // ─── Sports ──────────────────────────────────────────
-    p("sports", "sports-accessories/cricket-bat", 1, { title: "English Willow Cricket Bat", brand: "ProPlay", price: 3999, mrp: 5999, rating: 4.5, reviewsCount: 720, stock: 24, isFeatured: true, tags: ["cricket", "bat"], description: "Grade 2 English willow bat with a thick edge and cane handle for powerful strokes.", specifications: specs({ Size: "Short Handle", Weight: "1.15 kg", Willow: "English Grade 2" }) }),
-    p("sports", "sports-accessories/football", 1, { title: "Size 5 Training Football", brand: "ProPlay", price: 699, mrp: 1099, rating: 4.3, reviewsCount: 1430, stock: 85, tags: ["football", "ball"], description: "Machine-stitched size 5 football for training and casual matches on grass or turf.", specifications: specs({ Size: "5", Material: "PU" }) }),
-    p("sports", "sports-accessories/basketball", 1, { title: "Outdoor Rubber Basketball", brand: "ProPlay", price: 899, mrp: 1399, rating: 4.2, reviewsCount: 610, stock: 52, tags: ["basketball", "ball"], description: "Durable rubber basketball with deep channels for better grip on outdoor courts.", specifications: specs({ Size: "7", Material: "Rubber" }) }),
-    p("sports", "sports-accessories/tennis-racket", 1, { title: "Graphite Tennis Racket", brand: "AceSport", price: 2799, mrp: 3999, rating: 4.4, reviewsCount: 290, stock: 17, tags: ["tennis", "racket"], description: "Lightweight graphite racket with a large sweet spot — great for beginners and intermediates.", specifications: specs({ Weight: "280 g", "Head Size": "100 sq in" }) }),
-    p("sports", "sports-accessories/feather-shuttlecock", 1, { title: "Feather Shuttlecock (Pack of 6)", brand: "AceSport", price: 549, mrp: 799, rating: 4.1, reviewsCount: 1100, stock: 140, tags: ["badminton", "shuttlecock"], description: "Tournament-grade goose feather shuttlecocks with consistent flight.", specifications: specs({ Quantity: "6", Speed: "77" }) }),
-    p("sports", "sports-accessories/volleyball", 1, { title: "Soft-Touch Volleyball", brand: "ProPlay", price: 749, mrp: 1199, rating: 4.0, reviewsCount: 380, stock: 46, tags: ["volleyball", "ball"], description: "Soft-touch synthetic leather volleyball for indoor and beach play.", specifications: specs({ Size: "5", Material: "Synthetic Leather" }) }),
-
-    // ─── Watches & Eyewear ───────────────────────────────
-    p("watches-eyewear", "mens-watches/brown-leather-belt-watch", 3, { title: "Classic Brown Leather Strap Watch", brand: "Tempo", price: 1999, mrp: 3499, rating: 4.3, reviewsCount: 1250, stock: 58, tags: ["watch", "analog", "leather"], description: "Minimal analog watch with a genuine brown leather strap and a scratch-resistant glass dial.", specifications: specs({ Strap: "Leather", Dial: "40 mm", "Water Resistance": "30 m" }) }),
-    p("watches-eyewear", "mens-watches/rolex-submariner-watch", 3, { title: "Steel Diver Automatic Watch", brand: "Tempo", price: 24999, mrp: 32999, rating: 4.7, reviewsCount: 186, stock: 5, isFeatured: true, tags: ["watch", "automatic", "diver"], description: "Stainless steel automatic diver's watch with a rotating bezel and luminous hands.", specifications: specs({ Movement: "Automatic", Case: "41 mm Steel", "Water Resistance": "200 m" }) }),
-    p("watches-eyewear", "womens-watches/watch-gold-for-women", 3, { title: "Women's Gold Tone Bracelet Watch", brand: "Tempo", price: 2499, mrp: 3999, rating: 4.4, reviewsCount: 540, stock: 31, tags: ["watch", "women", "gold"], description: "Elegant gold-tone bracelet watch with a slim case and mother-of-pearl dial.", specifications: specs({ Strap: "Metal Bracelet", Dial: "32 mm" }) }),
-    p("watches-eyewear", "sunglasses/classic-sun-glasses", 3, { title: "Classic Wayfarer Sunglasses", brand: "Shade", price: 899, mrp: 1599, rating: 4.2, reviewsCount: 1610, stock: 77, tags: ["sunglasses", "uv400"], description: "Timeless wayfarer sunglasses with UV400 protection and a lightweight frame.", specifications: specs({ Protection: "UV400", Frame: "Acetate" }) }),
-    p("watches-eyewear", "sunglasses/green-and-black-glasses", 3, { title: "Aviator Sunglasses (Green/Black)", brand: "Shade", price: 1099, mrp: 1899, rating: 4.1, reviewsCount: 720, stock: 49, tags: ["sunglasses", "aviator", "polarized"], description: "Polarized aviator sunglasses with green lenses and a black metal frame.", specifications: specs({ Protection: "UV400 Polarized", Frame: "Metal" }) }),
-
-    // ─── Groceries ───────────────────────────────────────
-    p("groceries", "groceries/honey-jar", 1, { title: "Pure Forest Honey 500 g", brand: "Nature's Basket", price: 299, mrp: 399, rating: 4.6, reviewsCount: 2870, stock: 160, tags: ["honey", "organic"], description: "Raw, unprocessed forest honey collected from wild bee hives.", specifications: specs({ Weight: "500 g", Type: "Raw" }) }),
-    p("groceries", "groceries/nescafe-coffee", 1, { title: "Rich Instant Coffee 200 g", brand: "BrewMate", price: 549, mrp: 650, rating: 4.5, reviewsCount: 4120, stock: 140, tags: ["coffee", "beverage"], description: "Rich aroma instant coffee made from carefully roasted beans.", specifications: specs({ Weight: "200 g", Type: "Instant" }) }),
-    p("groceries", "groceries/rice", 1, { title: "Premium Basmati Rice 5 kg", brand: "Nature's Basket", price: 699, mrp: 899, rating: 4.4, reviewsCount: 1980, stock: 70, tags: ["rice", "staples"], description: "Long-grain aged basmati rice — fluffy and aromatic, perfect for biryani.", specifications: specs({ Weight: "5 kg", Grain: "Extra Long" }) }),
-    p("groceries", "groceries/cooking-oil", 1, { title: "Sunflower Cooking Oil 1 L", brand: "GoldDrop", price: 159, mrp: 199, rating: 4.2, reviewsCount: 3300, stock: 220, tags: ["oil", "staples"], description: "Refined sunflower oil rich in vitamin E for everyday cooking.", specifications: specs({ Volume: "1 L" }) }),
-    p("groceries", "groceries/strawberry", 1, { title: "Fresh Strawberries 250 g", brand: "FarmFresh", price: 149, mrp: 199, rating: 4.0, reviewsCount: 640, stock: 0, tags: ["fruits", "fresh"], description: "Sweet and juicy farm-fresh strawberries. Currently out of stock.", specifications: specs({ Weight: "250 g" }) }),
-    p("groceries", "groceries/protein-powder", 1, { title: "Whey Protein Powder 1 kg (Chocolate)", brand: "FitFuel", price: 1999, mrp: 2799, rating: 4.3, reviewsCount: 2560, stock: 38, tags: ["protein", "fitness", "supplement"], description: "24 g protein per scoop with added digestive enzymes. Rich chocolate flavour.", specifications: specs({ Weight: "1 kg", "Protein per serving": "24 g", Flavour: "Chocolate" }) }),
+    // ─── Toys & Development ──────────────────────────────
+    p("toys-development", ["infant", "toddler", "preschool"], [2815377, 7436118, 33796133], {
+        title: "Classic Teddy Bear 30 cm", brand: "Tiny Toes",
+        price: 899, mrp: 1199, rating: 4.9, reviewsCount: 2045, stock: 100, isFeatured: true,
+        tags: ["teddy bear", "soft toy", "plush"],
+        description: "A huggable, super-soft teddy with stitched eyes, safe for babies and loved for years.",
+        specifications: specs({ Height: "30 cm", Material: "Recycled polyester plush", Safety: "Embroidered eyes, EN71 tested" }),
+    }),
+    p("toys-development", ALL_AGES, [4887162, 4887173], {
+        title: "Pink Plush Bear Duo", brand: "Tiny Toes",
+        price: 1099, mrp: 1499, rating: 4.6, reviewsCount: 318, stock: 45,
+        tags: ["teddy bear", "soft toy", "pink", "gift"],
+        description: "Two soft pink bears, one big and one small, for sharing or decorating the nursery.",
+        specifications: specs({ Sizes: "25 cm + 15 cm", Material: "Organic cotton plush" }),
+    }),
+    p("toys-development", ["toddler", "preschool"], [7269700, 3975598, 7269694], {
+        title: "Wooden Building Blocks (40 pcs)", brand: "Nest & Grow",
+        price: 1299, mrp: 1799, rating: 4.8, reviewsCount: 864, stock: 65, isFeatured: true,
+        tags: ["blocks", "wooden", "building", "stem"],
+        description: "Forty colourful blocks in different shapes to stack, sort and build. Painted with water-based, child-safe paint.",
+        specifications: specs({ Pieces: "40", Material: "Solid beech wood", Paint: "Water-based, non-toxic", Age: "1 year +" }),
+    }),
+    p("toys-development", ["toddler", "preschool"], [3663060, 3933077], {
+        title: "Wooden Animal Figurines Set", brand: "Nest & Grow",
+        price: 999, mrp: 1399, rating: 4.5, reviewsCount: 207, stock: 40,
+        tags: ["animals", "wooden", "pretend play"],
+        description: "Twelve chunky wooden animals for pretend play, storytelling and learning animal names and sounds.",
+        specifications: specs({ Pieces: "12 animals", Material: "Solid wood", Age: "18 months +" }),
+    }),
+    p("toys-development", ["infant", "toddler"], [31152754, 27661863], {
+        title: "Rainbow Stacking Rings Tower", brand: "Little Nest",
+        price: 599, mrp: 799, rating: 4.7, reviewsCount: 745, stock: 90,
+        tags: ["stacking", "rings", "motor skills", "colours"],
+        description: "A classic stacking toy that builds hand-eye coordination and teaches colours and sizes.",
+        specifications: specs({ Rings: "6", Material: "BPA-free plastic", Age: "6 months +" }),
+    }),
+    p("toys-development", ["infant", "toddler"], [16145651, 12512698], {
+        title: "Musical Toy Piano", brand: "Tiny Toes",
+        price: 1499, mrp: 1999, rating: 4.4, reviewsCount: 296, stock: 30,
+        tags: ["piano", "music", "sensory"],
+        description: "A sturdy mini piano with eight real tones and a volume switch so everyone stays happy.",
+        specifications: specs({ Keys: "8", Volume: "2 levels", Batteries: "2 × AA (included)", Age: "9 months +" }),
+    }),
+    p("toys-development", ["toddler", "preschool"], [15250000, 10831693], {
+        title: "Wooden Train Set (32 pcs)", brand: "Nest & Grow",
+        price: 2499, mrp: 3299, rating: 4.8, reviewsCount: 402, stock: 22,
+        tags: ["train", "wooden", "track", "vehicles"],
+        description: "A figure-of-eight wooden railway with a bridge, a magnetic train and little cars.",
+        specifications: specs({ Pieces: "32", Material: "Beech wood", Connection: "Magnetic carriages", Age: "3 years +" }),
+    }),
+    p("toys-development", ["infant", "toddler"], [4488190, 12442773], {
+        title: "Push-Along Toy Cars Set", brand: "Tiny Toes",
+        price: 799, mrp: 1099, rating: 4.3, reviewsCount: 188, stock: 55,
+        tags: ["cars", "vehicles", "push along"],
+        description: "Four chunky push-along cars with soft rubber wheels, sized for little hands.",
+        specifications: specs({ Pieces: "4 cars", Material: "BPA-free plastic", Age: "10 months +" }),
+    }),
+    p("toys-development", ["toddler", "preschool"], [3662942], {
+        title: "Wooden Octopus Pull Toy", brand: "Nest & Grow",
+        price: 699, mrp: 949, rating: 4.6, reviewsCount: 112, stock: 35,
+        tags: ["pull toy", "wooden", "octopus", "walking"],
+        description: "A cheerful wooden octopus whose legs wiggle as it rolls. Great motivation for new walkers.",
+        specifications: specs({ Material: "Painted wood + cotton cord", "Cord length": "50 cm", Age: "12 months +" }),
+    }),
 ];

@@ -1,6 +1,7 @@
 # ShopNest API 🛒
 
 A REST API for learning how a **React e-commerce frontend** talks to a backend.
+The catalogue is a **baby store** (*Little Nest*): organic clothing, feeding, sleep & nursery, bath & skincare and toys, with **Shop by Age** (Newborn, Infant, Toddler, Preschool).
 Built with **Node.js, Express 5, MongoDB (Mongoose) and JWT**, documented with **Swagger**.
 
 > Students only **consume** this API from the React app (login, signup, home, products, product detail, search).
@@ -16,7 +17,7 @@ Built with **Node.js, Express 5, MongoDB (Mongoose) and JWT**, documented with *
 cd api
 pnpm install          # or: npm install
 cp .env.example .env  # then edit values if needed
-pnpm seed             # loads 10 categories, 63 products, 2 demo users
+pnpm seed             # loads 5 categories, 4 age groups, 41 baby products, 2 demo users
 pnpm dev              # starts http://localhost:5000 with auto-reload
 ```
 
@@ -82,7 +83,7 @@ api/
 │   └── paths/*.docs.js      # Swagger docs per module
 ├── seed/
 │   ├── seed.js
-│   └── data/                # categories.js, products.js, users.js
+│   └── data/                # categories.js, ageGroups.js, products.js, users.js, pexels.js
 └── postman/                 # Postman collection + environment
 ```
 
@@ -146,7 +147,7 @@ Password rules: at least 6 characters, at least 1 letter and 1 number.
 | Method | URL | Description |
 | --- | --- | --- |
 | GET | `/products` | List with pagination, filters and sorting |
-| GET | `/products/search?q=shirt` | Search (title, brand, tags, category name) |
+| GET | `/products/search?q=teddy` | Search (title, brand, tags, category name, age group name) |
 | GET | `/products/:id` | Product detail |
 | GET | `/products/slug/:slug` | Product detail by slug |
 | GET | `/products/:id/related?limit=4` | Same-category products ("You may also like") |
@@ -154,16 +155,17 @@ Password rules: at least 6 characters, at least 1 letter and 1 number.
 | PUT 🔒 admin | `/products/:id` | Update product (partial) |
 | DELETE 🔒 admin | `/products/:id` | Delete product |
 
-**Query params for `/products`, `/products/search` and `/categories/:slug/products`**
+**Query params for `/products`, `/products/search`, `/categories/:slug/products` and `/age-groups/:slug/products`**
 
 | Param | Example | Notes |
 | --- | --- | --- |
 | `page` | `2` | default `1` |
 | `limit` | `12` | default `12`, max `50` |
-| `search` / `q` | `phone` | `q` is required on `/products/search` |
-| `category` | `laptops` | category **slug** |
-| `brand` | `Nexa,Orbit` | comma separated, case-insensitive |
-| `minPrice` / `maxPrice` | `1000` / `50000` | in INR |
+| `search` / `q` | `bottle` | `q` is required on `/products/search` |
+| `category` | `feeding-essentials` | category **slug** |
+| `ageGroup` | `newborn` | age group **slug**: `newborn`, `infant`, `toddler`, `preschool` |
+| `brand` | `Little Nest,PureBub` | comma separated, case-insensitive |
+| `minPrice` / `maxPrice` | `300` / `2000` | in INR |
 | `minRating` | `4` | 0–5 |
 | `inStock` | `true` | `true` / `false` |
 | `featured` | `true` | use for the home page |
@@ -177,28 +179,51 @@ Password rules: at least 6 characters, at least 1 letter and 1 number.
 | GET | `/categories/:slug` | One category |
 | GET | `/categories/:slug/products` | Products in a category (same query params as above) |
 
+Categories: `organic-clothing`, `feeding-essentials`, `sleep-nursery`, `bath-skincare`, `toys-development`.
+
+### Age groups (Shop by Age)
+
+| Method | URL | Description |
+| --- | --- | --- |
+| GET | `/age-groups` | All age groups (youngest first) with `productCount` |
+| GET | `/age-groups/:slug` | One age group |
+| GET | `/age-groups/:slug/products` | Products for that age (same query params as above) |
+
+| Slug | Name | `ageRange` |
+| --- | --- | --- |
+| `newborn` | Newborn | 0–3 Months |
+| `infant` | Infant | 3–12 Months |
+| `toddler` | Toddler | 1–3 Years |
+| `preschool` | Preschool | 3–5 Years |
+
+A product can belong to **several** age groups (a teddy bear suits infants, toddlers and preschoolers).
+
 ### Product object
 
 ```json
 {
   "id": "6745a1f0c2b3d4e5f6a7b8d2",
-  "title": "Nexa 13 Pro (128 GB, Graphite)",
-  "slug": "nexa-13-pro-128-gb-graphite",
-  "description": "A flagship phone with ...",
-  "brand": "Nexa",
-  "category": { "id": "...", "name": "Smartphones", "slug": "smartphones", "image": "..." },
-  "price": 79999,
-  "mrp": 89999,
-  "discountPercentage": 11,
+  "title": "Anti-Colic Feeding Bottle 260 ml",
+  "slug": "anti-colic-feeding-bottle-260-ml",
+  "description": "A vented anti-colic bottle that reduces air intake and tummy troubles...",
+  "brand": "Little Nest",
+  "category": { "id": "...", "name": "Feeding Essentials", "slug": "feeding-essentials", "image": "..." },
+  "ageGroups": [
+    { "id": "...", "name": "Newborn", "slug": "newborn", "ageRange": "0–3 Months" },
+    { "id": "...", "name": "Infant", "slug": "infant", "ageRange": "3–12 Months" }
+  ],
+  "price": 499,
+  "mrp": 699,
+  "discountPercentage": 29,
   "currency": "INR",
-  "rating": 4.7,
-  "reviewsCount": 2341,
-  "stock": 25,
+  "rating": 4.6,
+  "reviewsCount": 2310,
+  "stock": 150,
   "inStock": true,
-  "thumbnail": "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/thumbnail.webp",
-  "images": ["...1.webp", "...2.webp", "...3.webp"],
-  "tags": ["5g", "flagship", "camera"],
-  "specifications": [{ "label": "Display", "value": "6.1\" OLED, 120Hz" }],
+  "thumbnail": "https://images.pexels.com/photos/374756/pexels-photo-374756.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "images": ["https://images.pexels.com/photos/374756/...&w=1200", "..."],
+  "tags": ["bottle", "anti-colic", "bpa free", "milk"],
+  "specifications": [{ "label": "Capacity", "value": "260 ml" }, { "label": "Material", "value": "BPA-free PP" }],
   "isFeatured": true,
   "createdAt": "...",
   "updatedAt": "..."
@@ -218,7 +243,7 @@ Password rules: at least 6 characters, at least 1 letter and 1 number.
 | 401 | `INVALID_TOKEN` / `TOKEN_EXPIRED` | Bad or expired token → log the user out |
 | 401 | `INVALID_CREDENTIALS` | Wrong email or password |
 | 403 | `FORBIDDEN` | Logged in but not an admin |
-| 404 | `PRODUCT_NOT_FOUND` / `CATEGORY_NOT_FOUND` | Resource does not exist |
+| 404 | `PRODUCT_NOT_FOUND` / `CATEGORY_NOT_FOUND` / `AGE_GROUP_NOT_FOUND` | Resource does not exist |
 | 404 | `ROUTE_NOT_FOUND` | Unknown URL |
 | 409 | `EMAIL_EXISTS` | Signup with an email that is already registered |
 | 500 | `INTERNAL_SERVER_ERROR` | Bug on the server |
@@ -283,17 +308,20 @@ The logs are written to **teach how the API works**: in development every reques
 A products request even shows the **real MongoDB query** that ran:
 
 ```
-[11:22:58] DEBUG: ↳ http: → GET /api/products?category=laptops&minPrice=80000&sort=price_asc&limit=2
-[11:22:58] DEBUG: ↳ validate: listQueryValidator(query) passed
-[11:22:58] DEBUG: ↳ controller: productController.getProducts → productService.listProducts()
-[11:22:58] DEBUG: ↳ service: productService.listProducts: page 1, limit 2 → skip 0
-[11:22:58] DEBUG: ↳ db: categories.findOne({ slug: 'laptops' }, {})
-[11:22:58] DEBUG: ↳ service: Built MongoDB filter from the query string
-    filter: { "category": "6b07...", "price": { "$gte": 80000 } }
-[11:22:58] DEBUG: ↳ db: products.find({ category: new ObjectId('6b07...'), price: { '$gte': 80000 } }, { sort: { price: 1, _id: 1 }, skip: 0, limit: 2 })
-[11:22:58] DEBUG: ↳ db: products.countDocuments({ category: new ObjectId('6b07...'), price: { '$gte': 80000 } }, {})
-[11:22:58] DEBUG: ↳ controller: Sending 200 with 2 of 4 products (page 1/2)
-[11:22:58] INFO:  GET /api/products?category=laptops&minPrice=80000&sort=price_asc&limit=2 200 - 158ms
+[14:06:52] DEBUG: ↳ http: → GET /api/products?category=feeding-essentials&ageGroup=newborn&sort=price_asc&limit=2
+[14:06:52] DEBUG: ↳ validate: listQueryValidator(query) passed
+[14:06:52] DEBUG: ↳ controller: productController.getProducts → productService.listProducts()
+[14:06:52] DEBUG: ↳ service: productService.listProducts: page 1, limit 2 → skip 0
+[14:06:52] DEBUG: ↳ db: categories.findOne({ slug: 'feeding-essentials' }, {})
+[14:06:52] DEBUG: ↳ db: agegroups.findOne({ slug: 'newborn' }, {})
+[14:06:52] DEBUG: ↳ service: Built MongoDB filter from the query string
+    filter: { "category": "6b07ef38...", "ageGroups": "6b07ef39..." }
+[14:06:52] DEBUG: ↳ db: products.find({ category: new ObjectId('6b07ef38...'), ageGroups: new ObjectId('6b07ef39...') }, { sort: { price: 1, _id: 1 }, skip: 0, limit: 2 })
+[14:06:52] DEBUG: ↳ db: products.countDocuments({ category: new ObjectId('6b07ef38...'), ageGroups: new ObjectId('6b07ef39...') }, {})
+[14:06:52] DEBUG: ↳ db: categories.find({ _id: { '$in': [ ... ] } }, { projection: { name: 1, slug: 1, image: 1 } })      ← populate("category")
+[14:06:52] DEBUG: ↳ db: agegroups.find({ _id: { '$in': [ ... ] } }, { sort: { sortOrder: 1 }, projection: { ... } })     ← populate("ageGroups")
+[14:06:52] DEBUG: ↳ controller: Sending 200 with 2 of 3 products (page 1/2)
+[14:06:52] INFO:  GET /api/products?category=feeding-essentials&ageGroup=newborn&sort=price_asc&limit=2 200 - 150ms
 ```
 
 And errors show **where** they stopped the request:
@@ -408,4 +436,4 @@ The data is already in Atlas if you ran `pnpm seed` locally with the same `MONGO
 
 ---
 
-Product images come from the free [dummyjson.com](https://dummyjson.com) image CDN.
+Product, category and age group photos are free [Pexels](https://www.pexels.com/license/) images (free to use, no attribution required), loaded by photo id from `images.pexels.com`. See `seed/data/pexels.js`.

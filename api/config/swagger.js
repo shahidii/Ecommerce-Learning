@@ -12,7 +12,7 @@ const options = {
             description: [
                 "Learning REST API for a React e-commerce frontend.",
                 "",
-                "**Features:** signup, login, JWT protected profile, products (pagination, filters, sorting), product detail, related products, categories and search.",
+                "**Features:** signup, login, JWT protected profile, baby products (pagination, filters, sorting), product detail, related products, categories, shop by age and search.",
                 "",
                 "**How to authorize:** call `POST /auth/login`, copy `data.token`, click the **Authorize** 🔒 button and paste the token.",
                 "",
@@ -24,7 +24,8 @@ const options = {
             { name: "General", description: "Health and API info" },
             { name: "Auth", description: "Signup, login and current user" },
             { name: "Products", description: "Product listing, detail, search and admin CRUD" },
-            { name: "Categories", description: "Product categories" },
+            { name: "Categories", description: "Product categories (Little Essentials)" },
+            { name: "Age Groups", description: "Shop by Age: Newborn, Infant, Toddler, Preschool" },
         ],
         components: {
             securitySchemes: {

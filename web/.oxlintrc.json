@@ -1,0 +1,44 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "oxc",
+    "jsx-a11y",
+    "import"
+  ],
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "react/jsx-key": "error",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/anchor-is-valid": "warn",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": [
+          "**/*.css"
+        ]
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "dist",
+    "node_modules"
+  ]
+}

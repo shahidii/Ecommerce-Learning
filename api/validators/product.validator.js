@@ -13,6 +13,7 @@ const listQueryValidator = (query) => {
         limit: toNumber(query.limit),
         search: isString(query.search) ? query.search.trim() : undefined,
         category: isString(query.category) ? query.category.trim().toLowerCase() : undefined,
+        ageGroup: isString(query.ageGroup) ? query.ageGroup.trim().toLowerCase() : undefined,
         brand: isString(query.brand) ? query.brand.trim() : undefined,
         minPrice: toNumber(query.minPrice),
         maxPrice: toNumber(query.maxPrice),
@@ -87,6 +88,11 @@ const productBodyValidator = (partial) => (body) => {
     if (has("categoryId")) {
         if (!mongoose.isValidObjectId(body.categoryId)) errors.push({ field: "categoryId", message: "categoryId must be a valid id" });
         else value.category = body.categoryId;
+    }
+    if (has("ageGroupIds")) {
+        if (!Array.isArray(body.ageGroupIds) || body.ageGroupIds.some((id) => !mongoose.isValidObjectId(id)))
+            errors.push({ field: "ageGroupIds", message: "ageGroupIds must be an array of valid ids" });
+        else value.ageGroups = [...new Set(body.ageGroupIds.map(String))];
     }
     if (has("thumbnail")) {
         if (!isString(body.thumbnail) || !URL_REGEX.test(body.thumbnail)) errors.push({ field: "thumbnail", message: "thumbnail must be a valid URL" });

@@ -6,6 +6,7 @@ const swaggerSpec = require("../config/swagger");
 const authRoutes = require("./auth.routes");
 const productRoutes = require("./product.routes");
 const categoryRoutes = require("./category.routes");
+const ageGroupRoutes = require("./ageGroup.routes");
 
 const router = express.Router();
 
@@ -27,6 +28,7 @@ router.get("/", (req, res) => {
                 auth: "/api/auth",
                 products: "/api/products",
                 categories: "/api/categories",
+                ageGroups: "/api/age-groups",
             },
         },
     });
@@ -49,5 +51,6 @@ router.get("/health", (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/products", productRoutes);
 router.use("/categories", categoryRoutes);
+router.use("/age-groups", ageGroupRoutes);
 
 module.exports = router;

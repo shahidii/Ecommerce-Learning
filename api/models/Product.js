@@ -13,6 +13,8 @@ const productSchema = new mongoose.Schema(
         description: { type: String, required: true, trim: true },
         brand: { type: String, trim: true, default: "Generic" },
         category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+        // One product can suit several ages, e.g. a teddy bear → infant, toddler, preschool
+        ageGroups: [{ type: mongoose.Schema.Types.ObjectId, ref: "AgeGroup" }],
 
         price: { type: Number, required: true, min: 0 }, // selling price (what the customer pays)
         mrp: { type: Number, required: true, min: 0 },   // original price (shown with a strike-through)
@@ -42,6 +44,7 @@ productSchema.virtual("inStock").get(function () {
 
 // Indexes make filtering & sorting fast
 productSchema.index({ category: 1, price: 1 });
+productSchema.index({ ageGroups: 1 });
 productSchema.index({ title: "text", description: "text", brand: "text", tags: "text" });
 
 productSchema.plugin(toJSONPlugin);
