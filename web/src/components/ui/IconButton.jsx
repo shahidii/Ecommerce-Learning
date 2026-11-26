@@ -1,13 +1,18 @@
+import { Link } from 'react-router'
 import { cn } from '@/utils/cn'
 
 /**
  * Round button that only shows an icon. `label` is required: screen readers read it.
  * <IconButton label="Open cart" count={3}><ShoppingBag /></IconButton>
+ * <IconButton label="Cart" to="/cart"><ShoppingBag /></IconButton>   ← renders a <Link>
  */
-export default function IconButton({ label, count, className, children, ...props }) {
+export default function IconButton({ label, count, to, className, children, ...props }) {
+  const Component = to ? Link : 'button'
+  const typeProps = to ? { to } : { type: 'button' }
+
   return (
-    <button
-      type="button"
+    <Component
+      {...typeProps}
       aria-label={count ? `${label} (${count})` : label}
       className={cn(
         'relative inline-flex size-10 items-center justify-center rounded-full text-foreground',
@@ -22,6 +27,6 @@ export default function IconButton({ label, count, className, children, ...props
           {count}
         </span>
       )}
-    </button>
+    </Component>
   )
 }

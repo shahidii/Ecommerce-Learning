@@ -1,9 +1,11 @@
+import { Link } from 'react-router'
+import { ROUTES } from '@/routes/paths'
 import { cn } from '@/utils/cn'
 
 /** Little Nest logo: an egg in a nest + the wordmark. */
 export default function Logo({ className }) {
   return (
-    <a href="#home" className={cn('inline-flex items-center gap-2.5 text-foreground', className)} aria-label="Little Nest home">
+    <Link to={ROUTES.HOME} className={cn('inline-flex items-center gap-2.5 text-foreground', className)} aria-label="Little Nest home">
       <svg viewBox="0 0 32 32" className="size-8 shrink-0" aria-hidden>
         <rect width="32" height="32" rx="9" className="fill-primary" />
         <ellipse cx="16" cy="14.5" rx="6" ry="7.5" className="fill-milk" />
@@ -12,6 +14,6 @@ export default function Logo({ className }) {
       <span className="font-serif text-2xl font-semibold tracking-tight" style={{ fontVariationSettings: '"SOFT" 100' }}>
         Little Nest
       </span>
-    </a>
+    </Link>
   )
 }

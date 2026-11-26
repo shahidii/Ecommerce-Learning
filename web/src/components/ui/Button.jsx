@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { cn } from '@/utils/cn'
 
 const variants = {
@@ -18,9 +19,10 @@ const sizes = {
 /**
  * <Button>Add to cart</Button>
  * <Button variant="outline" size="sm">Clear</Button>
- * <Button href="#shop">Shop now</Button>   ← renders an <a>
+ * <Button to="/shop">Shop now</Button>          ← renders a React Router <Link>
+ * <Button href="https://…">Docs</Button>      ← renders a normal <a> (external links)
  */
-export default function Button({ variant = 'primary', size = 'md', href, className, children, ...props }) {
+export default function Button({ variant = 'primary', size = 'md', to, href, className, children, ...props }) {
   const classes = cn(
     'inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap',
     'transition-colors duration-200 disabled:pointer-events-none disabled:opacity-50',
@@ -28,6 +30,14 @@ export default function Button({ variant = 'primary', size = 'md', href, classNa
     variants[variant],
     className,
   )
+
+  if (to) {
+    return (
+      <Link to={to} className={classes} {...props}>
+        {children}
+      </Link>
+    )
+  }
 
   if (href) {
     return (

@@ -1,9 +1,13 @@
 import { Leaf, Recycle, ShieldCheck } from 'lucide-react'
 import { Button, Container } from '@/components/ui'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { pexels } from '@/utils/image'
 
 const steps = [
-  { title: 'We start with the material', text: 'Organic cotton, merino, beech wood and food-grade silicone. If it touches skin or goes in a mouth, it has to be clean and simple.' },
+  {
+    title: 'We start with the material',
+    text: 'Organic cotton, merino, beech wood and food-grade silicone. If it touches skin or goes in a mouth, it has to be clean and simple.',
+  },
   { title: 'We test it the boring way', text: 'Lab safety tests first (EN71, BIS, BPA-free), then washing it 30 times to see what really happens.' },
   { title: 'Parents use it for a month', text: 'Real families try every product at home. If it is fiddly at 3 a.m., it does not make it to the shop.' },
 ]
@@ -15,14 +19,16 @@ const values = [
 ]
 
 export default function AboutPage() {
+  usePageTitle('About us')
+
   return (
     <>
       <Container className="grid items-center gap-12 py-14 lg:grid-cols-2 lg:py-20">
         <div>
           <h1 className="text-5xl leading-[1.05] sm:text-6xl">We choose every product as if it were for our own child.</h1>
           <p className="mt-6 max-w-lg text-lg text-muted">
-            Little Nest started in 2021 when two new parents in Kochi could not find baby clothes that were soft, safe and fairly priced in one place.
-            Today we carry a small, carefully tested range for the first five years.
+            Little Nest started in 2021 when two new parents in Kochi could not find baby clothes that were soft, safe and fairly priced in one place. Today we
+            carry a small, carefully tested range for the first five years.
           </p>
         </div>
         <img
@@ -65,7 +71,7 @@ export default function AboutPage() {
             <h2 className="text-3xl">Not sure where to start?</h2>
             <p className="mt-2 text-bark-800">Pick your child's age and we'll show you what fits right now.</p>
           </div>
-          <Button size="lg" href="#age">
+          <Button size="lg" to="/#age">
             Shop by age
           </Button>
         </div>

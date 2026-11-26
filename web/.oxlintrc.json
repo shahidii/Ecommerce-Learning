@@ -26,7 +26,15 @@
     "jsx-a11y/alt-text": "error",
     "jsx-a11y/anchor-is-valid": "warn",
     "no-unused-vars": "warn",
-    "no-console": "warn",
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
     "react/react-in-jsx-scope": "off",
     "import/no-unassigned-import": [
       "warn",
@@ -35,10 +43,21 @@
           "**/*.css"
         ]
       }
-    ]
+    ],
+    "import/no-named-as-default-member": "off"
   },
   "ignorePatterns": [
     "dist",
     "node_modules"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "src/routes/router.jsx"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
   ]
 }

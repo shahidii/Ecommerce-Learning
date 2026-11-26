@@ -1,37 +1,39 @@
-// Links used by the Navbar and Footer. `href` values are placeholders until routing (next phase).
+import { ROUTES, shopPath } from '@/routes/paths'
+
+// Links used by the Navbar and Footer. Paths come from routes/paths.js.
 export const mainNav = [
-  { label: 'Shop', href: '#shop' },
-  { label: 'Categories', href: '#categories' },
-  { label: 'Shop by age', href: '#age' },
-  { label: 'About', href: '#about' },
+  { label: 'Shop', to: ROUTES.SHOP },
+  { label: 'Categories', to: ROUTES.CATEGORIES },
+  { label: 'Shop by age', to: '/#age' },
+  { label: 'About', to: ROUTES.ABOUT },
 ]
 
 export const footerNav = [
   {
     title: 'Shop',
     links: [
-      { label: 'Organic clothing', href: '#organic-clothing' },
-      { label: 'Feeding essentials', href: '#feeding-essentials' },
-      { label: 'Sleep & nursery', href: '#sleep-nursery' },
-      { label: 'Bath & skincare', href: '#bath-skincare' },
-      { label: 'Toys & development', href: '#toys-development' },
+      { label: 'Organic clothing', to: shopPath({ category: 'organic-clothing' }) },
+      { label: 'Feeding essentials', to: shopPath({ category: 'feeding-essentials' }) },
+      { label: 'Sleep & nursery', to: shopPath({ category: 'sleep-nursery' }) },
+      { label: 'Bath & skincare', to: shopPath({ category: 'bath-skincare' }) },
+      { label: 'Toys & development', to: shopPath({ category: 'toys-development' }) },
     ],
   },
   {
-    title: 'Help',
+    title: 'Your account',
     links: [
-      { label: 'Shipping & delivery', href: '#shipping-delivery' },
-      { label: 'Returns & exchanges', href: '#returns-exchanges' },
-      { label: 'Size guide', href: '#size-guide' },
-      { label: 'Contact us', href: '#contact-us' },
+      { label: 'Log in', to: ROUTES.LOGIN },
+      { label: 'Create an account', to: ROUTES.SIGNUP },
+      { label: 'Wishlist', to: ROUTES.WISHLIST },
+      { label: 'Cart', to: ROUTES.CART },
     ],
   },
   {
     title: 'Little Nest',
     links: [
-      { label: 'Our story', href: '#our-story' },
-      { label: 'Materials we use', href: '#materials-we-use' },
-      { label: 'Safety standards', href: '#safety-standards' },
+      { label: 'Our story', to: ROUTES.ABOUT },
+      { label: 'Shop by age', to: '/#age' },
+      { label: 'New arrivals', to: shopPath({ sort: 'newest' }) },
     ],
   },
 ]

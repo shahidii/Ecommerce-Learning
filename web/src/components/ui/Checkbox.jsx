@@ -10,12 +10,7 @@ export default function Checkbox({ label, meta, className, id, ...props }) {
 
   return (
     <label htmlFor={checkboxId} className={cn('flex cursor-pointer items-center gap-3 py-1 text-[0.95rem]', className)}>
-      <input
-        id={checkboxId}
-        type="checkbox"
-        className="size-4.5 cursor-pointer rounded border-border-strong accent-sage-600"
-        {...props}
-      />
+      <input id={checkboxId} type="checkbox" className="size-4.5 cursor-pointer rounded border-border-strong accent-sage-600" {...props} />
       <span className="flex-1">{label}</span>
       {meta !== undefined && <span className="text-sm text-subtle">{meta}</span>}
     </label>

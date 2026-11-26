@@ -1,4 +1,5 @@
 import { Mail } from 'lucide-react'
+import { Link } from 'react-router'
 import { footerNav } from '@/constants/navigation'
 
 export default function Footer() {
@@ -41,9 +42,9 @@ export default function Footer() {
               <ul className="mt-4 flex flex-col gap-2.5 text-sm text-sage-100">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="hover:text-white hover:underline">
+                    <Link to={link.to} className="hover:text-white hover:underline">
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -57,12 +58,12 @@ export default function Footer() {
           <p>© 2026 Little Nest. A learning project built with React.</p>
           <ul className="flex items-center gap-5" aria-label="Social media">
             <li>
-              <a href="#instagram" className="hover:text-white hover:underline">
+              <a href="https://www.instagram.com/" className="hover:text-white hover:underline">
                 Instagram
               </a>
             </li>
             <li>
-              <a href="#youtube" className="hover:text-white hover:underline">
+              <a href="https://www.youtube.com/" className="hover:text-white hover:underline">
                 YouTube
               </a>
             </li>

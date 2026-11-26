@@ -10,9 +10,5 @@ const variants = {
 
 /** <Badge variant="blush">-29%</Badge> */
 export default function Badge({ variant = 'neutral', className, children }) {
-  return (
-    <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold', variants[variant], className)}>
-      {children}
-    </span>
-  )
+  return <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold', variants[variant], className)}>{children}</span>
 }

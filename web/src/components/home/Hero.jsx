@@ -1,4 +1,5 @@
 import { Button, Container, Rating } from '@/components/ui'
+import { ROUTES } from '@/routes/paths'
 import { pexels } from '@/utils/image'
 
 export default function Hero() {
@@ -11,10 +12,10 @@ export default function Hero() {
             Organic clothing, safe feeding gear, cosy sleep essentials and toys that grow with your child, from newborn to preschool.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <Button size="lg" href="#age">
+            <Button size="lg" to="/#age">
               Shop by age
             </Button>
-            <Button size="lg" variant="outline" href="#categories">
+            <Button size="lg" variant="outline" to={ROUTES.CATEGORIES}>
               Browse categories
             </Button>
           </div>

@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react'
+import { Link } from 'react-router'
 
-/** <Breadcrumbs items={[{ label: 'Home', href: '#' }, { label: 'Feeding essentials' }]} /> */
+/** <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Feeding essentials' }]} /> */
 export default function Breadcrumbs({ items }) {
   return (
     <nav aria-label="Breadcrumb">
@@ -15,9 +16,9 @@ export default function Breadcrumbs({ items }) {
                 </span>
               ) : (
                 <>
-                  <a href={item.href ?? '#'} className="hover:text-foreground hover:underline">
+                  <Link to={item.to} className="hover:text-foreground hover:underline">
                     {item.label}
-                  </a>
+                  </Link>
                   <ChevronRight aria-hidden className="size-3.5" />
                 </>
               )}

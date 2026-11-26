@@ -1,5 +1,5 @@
 import { RotateCcw, Truck } from 'lucide-react'
-import { FREE_SHIPPING_ABOVE } from '@/data/cart'
+import { FREE_SHIPPING_ABOVE } from '@/constants/shop'
 import { formatPrice } from '@/utils/formatPrice'
 
 export default function AnnouncementBar() {

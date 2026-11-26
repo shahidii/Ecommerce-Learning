@@ -1,6 +1,11 @@
 import { Baby, Heart, LogOut, MapPin, Package, Plus, UserRound } from 'lucide-react'
-import { Badge, Button, Container, Input } from '@/components/ui'
-import { addresses, childProfiles, user } from '@/data/user'
+import { Link } from 'react-router'
+import { Badge, Button, Container } from '@/components/ui'
+import { addresses, childProfiles } from '@/data/sampleProfile'
+import { useAuth } from '@/hooks/useAuth'
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { useWishlist } from '@/hooks/useWishlist'
+import { ROUTES } from '@/routes/paths'
 import { cn } from '@/utils/cn'
 
 const sections = [
@@ -8,10 +13,9 @@ const sections = [
   { id: 'little-ones', label: 'My little ones', icon: Baby },
   { id: 'addresses', label: 'Addresses', icon: MapPin },
   { id: 'orders', label: 'Orders', icon: Package },
-  { id: 'wishlist', label: 'Wishlist', icon: Heart },
 ]
 
-const memberSince = new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
+const formatDate = (date) => new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
 
 function Panel({ id, title, action, children }) {
   return (
@@ -27,7 +31,15 @@ function Panel({ id, title, action, children }) {
   )
 }
 
+/** Protected page: ProtectedRoute only renders it when `user` exists. */
 export default function ProfilePage() {
+  usePageTitle('Your account')
+  const { user, logout } = useAuth()
+  const { count: wishlistCount } = useWishlist()
+
+  // No navigate() needed: once `user` is null, ProtectedRoute notices and sends us to /login.
+  const handleLogout = () => logout()
+
   return (
     <Container className="py-10">
       {/* Profile header */}
@@ -36,9 +48,9 @@ export default function ProfilePage() {
         <div className="flex-1">
           <h1 className="text-3xl sm:text-4xl">Hello, {user.name.split(' ')[0]}</h1>
           <p className="mt-1 text-muted">{user.email}</p>
-          <p className="text-sm text-subtle">Member since {memberSince}</p>
+          <p className="text-sm text-subtle">Member since {formatDate(user.createdAt)}</p>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" onClick={handleLogout}>
           <LogOut aria-hidden className="size-4.5" />
           Log out
         </Button>
@@ -62,20 +74,39 @@ export default function ProfilePage() {
                 </a>
               </li>
             ))}
+            <li>
+              <Link
+                to={ROUTES.WISHLIST}
+                className="flex items-center gap-3 rounded-full px-4 py-2.5 text-[0.95rem] font-medium whitespace-nowrap text-bark-800 hover:bg-surface"
+              >
+                <Heart aria-hidden className="size-4.5" />
+                Wishlist ({wishlistCount})
+              </Link>
+            </li>
           </ul>
         </nav>
 
         <div className="flex flex-col gap-8">
           <Panel id="details" title="Account details">
-            <form className="grid gap-5 sm:grid-cols-2" onSubmit={(event) => event.preventDefault()}>
-              <Input label="Full name" defaultValue={user.name} autoComplete="name" />
-              <Input label="Email" type="email" defaultValue={user.email} autoComplete="email" />
-              <Input label="Phone" type="tel" defaultValue="+91 98765 43210" autoComplete="tel" />
-              <Input label="Birthday (optional)" type="date" />
-              <div className="sm:col-span-2">
-                <Button type="submit">Save changes</Button>
+            {/* Straight from GET /api/auth/me (stored in AuthContext) */}
+            <dl className="grid gap-x-8 gap-y-5 text-[0.95rem] sm:grid-cols-2">
+              <div>
+                <dt className="text-sm text-muted">Full name</dt>
+                <dd className="mt-1 font-semibold">{user.name}</dd>
               </div>
-            </form>
+              <div>
+                <dt className="text-sm text-muted">Email</dt>
+                <dd className="mt-1 font-semibold break-all">{user.email}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Account type</dt>
+                <dd className="mt-1 font-semibold capitalize">{user.role}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Joined</dt>
+                <dd className="mt-1 font-semibold">{formatDate(user.createdAt)}</dd>
+              </div>
+            </dl>
           </Panel>
 
           <Panel
@@ -88,7 +119,9 @@ export default function ProfilePage() {
               </Button>
             }
           >
-            <p className="text-sm text-muted">We use your child's age to suggest the right stage and sizes.</p>
+            <p className="text-sm text-muted">
+              We use your child's age to suggest the right stage and sizes. <Badge>Sample data</Badge>
+            </p>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2">
               {childProfiles.map((child) => (
                 <li key={child.id} className="flex items-center gap-4 rounded-3xl bg-surface-soft p-4">
@@ -114,6 +147,9 @@ export default function ProfilePage() {
               </Button>
             }
           >
+            <p className="mb-4 text-sm text-muted">
+              Addresses get their own API in the checkout phase. <Badge>Sample data</Badge>
+            </p>
             <ul className="grid gap-4 md:grid-cols-2">
               {addresses.map((address) => (
                 <li key={address.id} className={cn('rounded-3xl border p-5 text-sm', address.isDefault ? 'border-sage-300 bg-sage-50' : 'border-border')}>
@@ -148,7 +184,7 @@ export default function ProfilePage() {
               <Package aria-hidden className="size-10 text-sage-500" />
               <p className="mt-4 font-serif text-xl">No orders yet</p>
               <p className="mt-1 max-w-sm text-sm text-muted">When you place an order, you can track it and reorder favourites from here.</p>
-              <Button href="#shop" className="mt-6">
+              <Button to={ROUTES.SHOP} className="mt-6">
                 Start shopping
               </Button>
             </div>

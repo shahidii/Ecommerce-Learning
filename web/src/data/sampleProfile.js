@@ -1,13 +1,5 @@
-// Dummy logged-in user for the Profile page UI (same shape as GET /api/auth/me → data.user).
-export const user = {
-  id: 'user-1',
-  name: 'Demo User',
-  email: 'demo@shopnest.dev',
-  avatar: 'https://ui-avatars.com/api/?name=Demo%20User&background=dce6d8&color=3d503b&size=160',
-  role: 'customer',
-  createdAt: '2026-03-14T09:30:00.000Z',
-}
-
+// Sample addresses and children for the Profile page. The API has no endpoints for these yet
+// (they come with the checkout phase), so the page labels them "Sample data".
 export const addresses = [
   {
     id: 'addr-1',
@@ -35,6 +27,4 @@ export const addresses = [
   },
 ]
 
-export const childProfiles = [
-  { id: 'child-1', name: 'Aanya', ageLabel: '8 months', ageGroup: 'Infant' },
-]
+export const childProfiles = [{ id: 'child-1', name: 'Aanya', ageLabel: '8 months', ageGroup: 'Infant' }]

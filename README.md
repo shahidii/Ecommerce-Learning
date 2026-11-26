@@ -5,7 +5,7 @@ A teaching project: students build a **React e-commerce frontend** (a baby store
 | Folder | What | Status |
 | --- | --- | --- |
 | [`api/`](api/README.md) | Express + MongoDB REST API with Swagger docs and a Postman collection | ✅ Ready |
-| [`web/`](web/README.md) | React + Vite + Tailwind frontend (Little Nest): all pages as UI with dummy data | 🟡 Phase 6 of the guide done (UI only) |
+| [`web/`](web/README.md) | React + Vite + Tailwind frontend (Little Nest), connected to the live API | 🟡 Phase 10 of the guide done (routing, API, auth, context) |
 
 ## Run the API
 
@@ -25,9 +25,12 @@ pnpm dev
 
 ```bash
 cd web
+cp .env.example .env
 pnpm install
 pnpm dev
 ```
+
+The website talks to the live API at https://ecommerce-learning-api.onrender.com/api (change `VITE_API_URL` in `web/.env` to use your local API).
 
 ## Pages students build (web/)
 
@@ -40,4 +43,4 @@ pnpm dev
 | Product detail | `GET /products/:id`, `GET /products/:id/related` |
 | Search | `GET /products/search?q=` (debounced search bar) |
 
-Add to cart and wishlist are **buttons only**. They are not wired to the API.
+Cart and wishlist live in React Context and are saved in localStorage. Syncing them with the API comes with checkout in a later phase.

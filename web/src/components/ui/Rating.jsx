@@ -9,19 +9,14 @@ export default function Rating({ value, count, size = 'sm', className }) {
     <div className={cn('flex items-center gap-1.5', className)}>
       <div className="flex" aria-hidden>
         {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={cn(iconSize, star <= Math.round(value) ? 'fill-butter-400 text-butter-400' : 'fill-oat-200 text-oat-200')}
-          />
+          <Star key={star} className={cn(iconSize, star <= Math.round(value) ? 'fill-butter-400 text-butter-400' : 'fill-oat-200 text-oat-200')} />
         ))}
       </div>
       <span className={cn('font-semibold', size === 'sm' ? 'text-xs' : 'text-sm')}>
         {value.toFixed(1)}
         <span className="sr-only"> out of 5 stars</span>
       </span>
-      {count !== undefined && (
-        <span className={cn('text-muted', size === 'sm' ? 'text-xs' : 'text-sm')}>({count.toLocaleString('en-IN')} reviews)</span>
-      )}
+      {count !== undefined && <span className={cn('text-muted', size === 'sm' ? 'text-xs' : 'text-sm')}>({count.toLocaleString('en-IN')} reviews)</span>}
     </div>
   )
 }
