@@ -17,8 +17,9 @@ const start = async () => {
             logger.fatal({ err: error }, `Could not start server: ${error.message}${hint}`);
             process.exit(1);
         }
-        logger.info(`Server running at http://localhost:${env.PORT} (${env.NODE_ENV})`);
-        logger.info(`Swagger docs at  http://localhost:${env.PORT}/api/docs`);
+        logger.info(`Server listening on port ${env.PORT} (${env.NODE_ENV})`);
+        logger.info(`API:     ${env.API_BASE_URL}/api`);
+        logger.info(`Swagger: ${env.API_BASE_URL}/api/docs`);
     });
 
     // Graceful shutdown: finish open requests, close DB, then exit

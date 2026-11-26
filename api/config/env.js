@@ -17,7 +17,13 @@ const env = {
         .split(",")
         .map((origin) => origin.trim())
         .filter(Boolean),
-    API_BASE_URL: process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 5000}`,
+    // Public URL of this API (used by Swagger and CORS).
+    // On Render, RENDER_EXTERNAL_URL is set automatically, e.g. https://ecommerce-learning-api.onrender.com
+    API_BASE_URL: (
+        process.env.API_BASE_URL ||
+        process.env.RENDER_EXTERNAL_URL ||
+        `http://localhost:${process.env.PORT || 5000}`
+    ).replace(/\/+$/, ""),
 };
 
 // Fail fast with a helpful message if something important is missing

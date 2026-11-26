@@ -252,8 +252,8 @@ Each request has tests (see the *Tests* tab), and you can use **Run collection**
 | `MONGODB_DB_NAME` | `shopnest` | Database name used on Atlas / local |
 | `JWT_SECRET` | long random string | Used to sign tokens |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
-| `ALLOWED_ORIGINS` | `http://localhost:5173` | Frontend URLs allowed by CORS (any localhost port is allowed in development) |
-| `API_BASE_URL` | `http://localhost:5000` | Shown as the server in Swagger |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` or `*` | Frontend URLs allowed by CORS (comma separated). `*` = any website. Any localhost port is always allowed in development, and the API's own URL is always allowed |
+| `API_BASE_URL` | `https://your-api.onrender.com` | Public URL shown in Swagger. Optional on Render (it uses `RENDER_EXTERNAL_URL` automatically) |
 | `LOG_LEVEL` | `debug` | Optional. `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `silent`. Default: `debug` in development, `info` in production |
 
 ---
@@ -362,6 +362,41 @@ log.warn({ userId }, "Coupon already used");        // something suspicious
 const logger = require("../config/logger");
 logger.error({ err }, "Payment provider down");     // pass errors as { err } to keep the stack
 ```
+
+---
+
+## 9. Deploy on Render
+
+1. Push the repo to GitHub (`.env` is git-ignored, so your secrets stay local).
+2. Render → **New → Web Service** → pick the repo.
+3. Settings:
+
+| Setting | Value |
+| --- | --- |
+| Root Directory | `api` |
+| Runtime | `Node` |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Health Check Path | `/api/health` |
+
+4. **Environment** tab → add these variables (do **not** add `PORT`; Render sets it):
+
+| Key | Value |
+| --- | --- |
+| `NODE_ENV` | `production` |
+| `MONGODB_URI` | your Atlas `mongodb+srv://...` URI |
+| `MONGODB_DB_NAME` | `shopnest` |
+| `JWT_SECRET` | a long random string, e.g. output of `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
+| `JWT_EXPIRES_IN` | `7d` |
+| `ALLOWED_ORIGINS` | `*` (any student frontend) or a list like `http://localhost:5173,https://my-shop.vercel.app` |
+
+5. **MongoDB Atlas → Network Access → Add IP Address → Allow access from anywhere (`0.0.0.0/0`)**.
+   Render's free plan has no fixed IP, so without this the server cannot reach the database.
+6. Deploy. Then open `https://<your-service>.onrender.com/api/docs`.
+
+The data is already in Atlas if you ran `pnpm seed` locally with the same `MONGODB_URI`.
+
+> **Free plan note:** the service sleeps after ~15 minutes without traffic. The first request after that takes ~30–60 s to wake up, so tell students not to panic about one slow request (and to show a loading state in React!).
 
 ---
 
